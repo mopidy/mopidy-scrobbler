@@ -25,6 +25,7 @@ setup(
     install_requires=[
         'setuptools',
         'Mopidy',
+        'Pykka >= 1.1',
         'pylast >= 0.5.7',
     ],
     entry_points={
