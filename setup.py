@@ -13,7 +13,7 @@ def get_version(filename):
 setup(
     name='Mopidy-Scrobbler',
     version=get_version('mopidy_scrobbler/__init__.py'),
-    url='https://github.com/jodal/mopidy-scrobbler',
+    url='https://github.com/mopidy/mopidy-scrobbler',
     license='Apache License, Version 2.0',
     author='Stein Magnus Jodal',
     author_email='stein.magnus@jodal.no',
@@ -25,6 +25,7 @@ setup(
     install_requires=[
         'setuptools',
         'Mopidy',
+        'pylast >= 0.5.7',
     ],
     entry_points={
         'mopidy.ext': [
