@@ -1,11 +1,13 @@
+****************
 Mopidy-Scrobbler
-================
+****************
 
 `Mopidy <http://www.mopidy.com/>`_ extension for scrobbling played tracks to
 `Last.fm <http://www.last.fm/>`_.
 
-Usage
------
+
+Installation
+============
 
 Install by running::
 
@@ -14,6 +16,10 @@ Install by running::
 Or, if available, install the Debian/Ubuntu package from `apt.mopidy.com
 <http://apt.mopidy.com/>`_.
 
+
+Configuration
+=============
+
 Before starting Mopidy, you must add your Last.fm username and password to your
 Mopidy configuration file::
 
@@ -21,9 +27,19 @@ Mopidy configuration file::
     username = alice
     password = secret
 
+
 Project resources
------------------
+=================
 
 - `Source code <https://github.com/mopidy/mopidy-scrobbler>`_
 - `Issue tracker <https://github.com/mopidy/mopidy-scrobbler/issues>`_
 - `Download development snapshot <https://github.com/mopidy/mopidy-scrobbler/tarball/master#egg=Mopidy-Scrobbler-dev>`_
+
+
+Changelog
+=========
+
+v0.1.0 (UNRELEASED)
+-------------------
+
+- Moved extension out of the main Mopidy project.
