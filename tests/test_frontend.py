@@ -33,7 +33,8 @@ class FrontendTest(unittest.TestCase):
 
     def test_on_start_stops_actor_on_error(self, pylast_mock):
         pylast_mock.NetworkError = pylast.NetworkError
-        pylast_mock.LastFMNetwork.side_effect = pylast.NetworkError(None, None)
+        pylast_mock.LastFMNetwork.side_effect = pylast.NetworkError(
+            None, 'foo')
         self.frontend.stop = mock.Mock()
 
         self.frontend.on_start()
@@ -82,7 +83,7 @@ class FrontendTest(unittest.TestCase):
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
         pylast_mock.ScrobblingError = pylast.ScrobblingError
         self.frontend.lastfm.update_now_playing.side_effect = (
-            pylast.ScrobblingError(None))
+            pylast.ScrobblingError('foo'))
         track = models.Track()
         tl_track = models.TlTrack(track=track, tlid=17)
 
@@ -144,7 +145,7 @@ class FrontendTest(unittest.TestCase):
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
         pylast_mock.ScrobblingError = pylast.ScrobblingError
         self.frontend.lastfm.scrobble.side_effect = (
-            pylast.ScrobblingError(None))
+            pylast.ScrobblingError('foo'))
         track = models.Track(length=180432)
         tl_track = models.TlTrack(track=track, tlid=17)
 
