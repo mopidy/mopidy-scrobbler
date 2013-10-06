@@ -28,6 +28,11 @@ setup(
         'Pykka >= 1.1',
         'pylast >= 0.5.7',
     ],
+    test_suite='nose.collector',
+    tests_require=[
+        'nose',
+        'mock >= 1.0',
+    ],
     entry_points={
         'mopidy.ext': [
             'scrobbler = mopidy_scrobbler:Extension',
