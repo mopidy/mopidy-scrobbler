@@ -24,7 +24,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'setuptools',
-        'Mopidy',
+        'Mopidy >= 0.16',
         'Pykka >= 1.1',
         'pylast >= 0.5.7',
     ],
