@@ -59,3 +59,5 @@ v0.1.0 (UNRELEASED)
 -------------------
 
 - Moved extension out of the main Mopidy project.
+
+- Added test suite.
