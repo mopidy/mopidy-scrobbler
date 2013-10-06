@@ -2,6 +2,22 @@
 Mopidy-Scrobbler
 ****************
 
+.. image:: https://pypip.in/v/Mopidy-Scrobbler/badge.png
+    :target: https://crate.io/packages/Mopidy-Scrobbler/
+    :alt: Latest PyPI version
+
+.. image:: https://pypip.in/d/Mopidy-Scrobbler/badge.png
+    :target: https://crate.io/packages/Mopidy-Scrobbler/
+    :alt: Number of PyPI downloads
+
+.. image:: https://travis-ci.org/mopidy/mopidy-scrobbler.png?branch=master
+    :target: https://travis-ci.org/mopidy/mopidy-scrobbler
+    :alt: Travis CI build status
+
+.. image:: https://coveralls.io/repos/mopidy/mopidy-scrobbler/badge.png?branch=master
+   :target: https://coveralls.io/r/mopidy/mopidy-scrobbler?branch=master
+   :alt: Test coverage
+
 `Mopidy <http://www.mopidy.com/>`_ extension for scrobbling played tracks to
 `Last.fm <http://www.last.fm/>`_.
 
