@@ -21,6 +21,8 @@ Mopidy-Scrobbler
 `Mopidy <http://www.mopidy.com/>`_ extension for scrobbling played tracks to
 `Last.fm <http://www.last.fm/>`_.
 
+This extension requires a free user account at Last.fm.
+
 
 Installation
 ============
@@ -36,12 +38,19 @@ Or, if available, install the Debian/Ubuntu package from `apt.mopidy.com
 Configuration
 =============
 
-Before starting Mopidy, you must add your Last.fm username and password to your
-Mopidy configuration file::
+The extension is enabled by default when it is installed. You just need to add
+your Last.fm username and password to your Mopidy configuration file, typically
+found at ``~/.config/mopidy/mopidy.conf``::
 
     [scrobbler]
     username = alice
     password = secret
+
+The following configuration values are available:
+
+- ``scrobbler/enabled``: If the scrobbler extension should be enabled or not.
+- ``scrobbler/username``: Your Last.fm username.
+- ``scrobbler/password``: Your Last.fm password.
 
 
 Project resources
