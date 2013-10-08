@@ -64,7 +64,7 @@ Project resources
 Changelog
 =========
 
-v0.1.0 (UNRELEASED)
+v1.0.0 (2013-10-08)
 -------------------
 
 - Moved extension out of the main Mopidy project.
