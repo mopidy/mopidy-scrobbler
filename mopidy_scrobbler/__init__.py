@@ -24,6 +24,6 @@ class Extension(ext.Extension):
         schema['password'] = config.Secret()
         return schema
 
-    def get_frontend_classes(self):
+    def setup(self, registry):
         from .frontend import ScrobblerFrontend
-        return [ScrobblerFrontend]
+        registry.add('frontend', ScrobblerFrontend)

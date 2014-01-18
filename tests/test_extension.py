@@ -1,3 +1,4 @@
+import mock
 import unittest
 
 from mopidy_scrobbler import Extension, frontend as frontend_lib
@@ -23,9 +24,11 @@ class ExtensionTest(unittest.TestCase):
         self.assertIn('username', schema)
         self.assertIn('password', schema)
 
-    def test_get_frontend_classes(self):
+    def test_setup(self):
         ext = Extension()
+        registry = mock.Mock()
 
-        classes = ext.get_frontend_classes()
+        ext.setup(registry)
 
-        self.assertIn(frontend_lib.ScrobblerFrontend, classes)
+        registry.add.assert_called_once_with(
+            'frontend', frontend_lib.ScrobblerFrontend)
