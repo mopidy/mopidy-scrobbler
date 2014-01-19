@@ -1,4 +1,8 @@
+include .coveragerc
+include .travis.yml
 include LICENSE
 include MANIFEST.in
 include README.rst
 include mopidy_scrobbler/ext.conf
+
+recursive-include tests *.py
