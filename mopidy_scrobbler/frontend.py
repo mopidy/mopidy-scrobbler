@@ -9,7 +9,7 @@ import pylast
 from mopidy.core import CoreListener
 
 
-logger = logging.getLogger('mopidy_scrobbler')
+logger = logging.getLogger(__name__)
 
 API_KEY = '2236babefa8ebb3d93ea467560d00d04'
 API_SECRET = '94d9a09c0cd5be955c4afaeaffcaefcd'
