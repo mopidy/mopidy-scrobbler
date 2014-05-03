@@ -36,7 +36,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
 
     def track_playback_started(self, tl_track):
         track = tl_track.track
-        artists = ', '.join([a.name for a in track.artists])
+        artists = ', '.join(sorted([a.name for a in track.artists]))
         duration = track.length and track.length // 1000 or 0
         self.last_start_time = int(time.time())
         logger.debug('Now playing track: %s - %s', artists, track.name)
@@ -54,7 +54,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
 
     def track_playback_ended(self, tl_track, time_position):
         track = tl_track.track
-        artists = ', '.join([a.name for a in track.artists])
+        artists = ', '.join(sorted([a.name for a in track.artists]))
         duration = track.length and track.length // 1000 or 0
         time_position = time_position // 1000
         if duration < 30:
