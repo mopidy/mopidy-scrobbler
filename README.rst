@@ -64,6 +64,12 @@ Project resources
 Changelog
 =========
 
+v1.1.1 (UNRELEASED)
+-------------------
+
+- Updated to work with ``None`` as the default value of ``track_no`` in
+  Mopidy's ``Track`` model. This was changed in Mopidy 0.20.
+
 v1.1.0 (2014-01-20)
 -------------------
 

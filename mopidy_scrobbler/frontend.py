@@ -46,7 +46,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 (track.name or ''),
                 album=(track.album and track.album.name or ''),
                 duration=str(duration),
-                track_number=str(track.track_no),
+                track_number=str(track.track_no or 0),
                 mbid=(track.musicbrainz_id or ''))
         except (pylast.ScrobblingError, pylast.NetworkError,
                 pylast.MalformedResponseError, pylast.WSError) as e:
@@ -73,7 +73,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 (track.name or ''),
                 str(self.last_start_time),
                 album=(track.album and track.album.name or ''),
-                track_number=str(track.track_no),
+                track_number=str(track.track_no or 0),
                 duration=str(duration),
                 mbid=(track.musicbrainz_id or ''))
         except (pylast.ScrobblingError, pylast.NetworkError,

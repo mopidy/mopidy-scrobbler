@@ -114,6 +114,23 @@ class FrontendTest(unittest.TestCase):
             track_number='3',
             mbid='123-456')
 
+    def test_track_playback_ended_has_default_values(self, pylast_mock):
+        self.frontend.last_start_time = 123
+        self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+        track = models.Track(length=180432)
+        tl_track = models.TlTrack(track=track, tlid=17)
+
+        self.frontend.track_playback_ended(tl_track, 150000)
+
+        self.frontend.lastfm.scrobble.assert_called_with(
+            '',
+            '',
+            '123',
+            duration='180',
+            album='',
+            track_number='0',
+            mbid='')
+
     def test_does_not_scrobble_tracks_shorter_than_30_sec(self, pylast_mock):
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
         track = models.Track(length=20432)
