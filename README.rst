@@ -2,19 +2,19 @@
 Mopidy-Scrobbler
 ****************
 
-.. image:: https://pypip.in/v/Mopidy-Scrobbler/badge.png
+.. image:: https://img.shields.io/pypi/v/Mopidy-Scrobbler.svg?style=flat
     :target: https://pypi.python.org/pypi/Mopidy-Scrobbler/
     :alt: Latest PyPI version
 
-.. image:: https://pypip.in/d/Mopidy-Scrobbler/badge.png
+.. image:: https://img.shields.io/pypi/dm/Mopidy-Scrobbler.svg?style=flat
     :target: https://pypi.python.org/pypi/Mopidy-Scrobbler/
     :alt: Number of PyPI downloads
 
-.. image:: https://travis-ci.org/mopidy/mopidy-scrobbler.png?branch=master
+.. image:: https://img.shields.io/travis/mopidy/mopidy-scrobbler/master?style=flat
     :target: https://travis-ci.org/mopidy/mopidy-scrobbler
     :alt: Travis CI build status
 
-.. image:: https://coveralls.io/repos/mopidy/mopidy-scrobbler/badge.png?branch=master
+.. image:: https://img.shields.io/coveralls/mopidy/mopidy-scrobbler/master?style=flat
    :target: https://coveralls.io/r/mopidy/mopidy-scrobbler?branch=master
    :alt: Test coverage
 
