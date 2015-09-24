@@ -58,7 +58,6 @@ Project resources
 
 - `Source code <https://github.com/mopidy/mopidy-scrobbler>`_
 - `Issue tracker <https://github.com/mopidy/mopidy-scrobbler/issues>`_
-- `Download development snapshot <https://github.com/mopidy/mopidy-scrobbler/tarball/master#egg=Mopidy-Scrobbler-dev>`_
 
 
 Changelog
