@@ -34,10 +34,10 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
             logger.error('Error during Last.fm setup: %s', e)
             self.stop()
 
-    def getDuration(track):
+    def getDuration(self, track):
         return track.length and track.length // 1000 or 0
 
-    def getArtists(track):
+    def getArtists(self, track):
         ''' Return a tuple consisting of the first artist and a merged string of
         artists. The first artist is considered to be the primary artist of the
         track. The artists are joined by using slashes as recommended in
