@@ -41,11 +41,16 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         ''' Return a tuple consisting of the first artist and a merged string of
         artists. The first artist is considered to be the primary artist of the
         track. The artists are joined by using slashes as recommended in
-        ID3v2.3. '''
+        ID3v2.3. Prefer the album artist if any is given. '''
         if not len(track.artists):
             logger.error('The track does not have any artists.')
             raise ValueError
-        artists =  '/'.join(sorted([a.name for a in track.artists]))
+        artists = track.artists
+        if track.album and track.album.artists:
+            firstAlphabeticalArtist = sorted([a.name for a in artists][0])
+            if firstAlphabeticalArtist != 'Compilation' and firstAlphabeticalArtist != 'Split':
+                artists = track.album.artists
+        artists = ', '.join(sorted([a.name for a in artists]))
         artist = artists[0]
         return (artist, artists)
 
