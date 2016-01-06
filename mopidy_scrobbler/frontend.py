@@ -50,8 +50,8 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
             artists = [a.name for a in track.album.artists]
             if artists[0] != 'Compilation' and artists[0] != 'Split':
                 artists = [a.name for a in track.artists]
-        artists = '/'.join(artists)
         primaryArtist = artists[0]
+        artists = '/'.join(artists)
         return (primaryArtist, artists)
 
     def track_playback_started(self, tl_track):
