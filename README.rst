@@ -63,6 +63,12 @@ Project resources
 Changelog
 =========
 
+v1.1.2 (2015-01-06)
+-------------------
+
+- Scrobble only the first given artist instead of a concatenated string of
+  all existing artists to prevent Last.fm from creating bogus artist pages.
+
 v1.1.1 (2014-12-29)
 -------------------
 
