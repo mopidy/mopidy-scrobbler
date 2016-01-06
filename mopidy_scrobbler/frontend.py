@@ -45,14 +45,14 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         if not len(track.artists):
             logger.error('The track does not have any artists.')
             raise ValueError
-        artists = track.artists
+        artists = [a.name for a in track.artists]
         if track.album and track.album.artists:
-            firstAlphabeticalArtist = sorted([a.name for a in artists][0])
-            if firstAlphabeticalArtist != 'Compilation' and firstAlphabeticalArtist != 'Split':
-                artists = track.album.artists
-        artists = ', '.join(sorted([a.name for a in artists]))
-        artist = artists[0]
-        return (artist, artists)
+            artists = [a.name for a in track.album.artists]
+            if artists[0] != 'Compilation' and artists[0] != 'Split':
+                artists = [a.name for a in track.artists]
+        artists = '/'.join(artists)
+        primaryArtist = artists[0]
+        return (primaryArtist, artists)
 
     def track_playback_started(self, tl_track):
         track = tl_track.track
