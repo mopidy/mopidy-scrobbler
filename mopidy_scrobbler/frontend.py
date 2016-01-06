@@ -56,7 +56,6 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
 
     def track_playback_started(self, tl_track):
         track = tl_track.track
-        assert len(track.artists), logger.error('The track does not have any artists.')
         (artist, artists) = self.getArtists(track)
         duration = self.getDuration(track)
         self.last_start_time = int(time.time())
