@@ -1,5 +1,6 @@
-import mock
 import unittest
+
+import mock
 
 from mopidy_scrobbler import Extension, frontend as frontend_lib
 

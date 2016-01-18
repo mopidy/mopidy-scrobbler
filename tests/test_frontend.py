@@ -1,9 +1,11 @@
-import mock
 import unittest
+
+import mock
+
+from mopidy import models
 
 import pylast
 
-from mopidy import models
 from mopidy_scrobbler import frontend as frontend_lib
 
 
