@@ -35,15 +35,37 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
             logger.error('Error during Last.fm setup: %s', e)
             self.stop()
 
+    def getDuration(self, track):
+        return track.length and track.length // 1000 or 0
+
+    def getArtists(self, track):
+        ''' Return a tuple consisting of the first artist and a merged string of
+        artists. The first artist is considered to be the primary artist of the
+        track. The artists are joined by using slashes as recommended in
+        ID3v2.3. Prefer the album artist if any is given. '''
+        if not len(track.artists):
+            logger.error('The track does not have any artists.')
+            raise ValueError
+        artists = [a.name for a in track.artists]
+        if track.album and track.album.artists:
+            artists = [a.name for a in track.album.artists]
+
+            metaArtists = ['compilation', 'split', 'various artists']
+            if artists[0].lower() in metaArtists:
+                artists = [a.name for a in track.artists]
+        primaryArtist = artists[0]
+        artists = '/'.join(artists)
+        return (primaryArtist, artists)
+
     def track_playback_started(self, tl_track):
         track = tl_track.track
-        artists = ', '.join(sorted([a.name for a in track.artists]))
-        duration = track.length and track.length // 1000 or 0
+        (artist, artists) = self.getArtists(track)
+        duration = self.getDuration(track)
         self.last_start_time = int(time.time())
         logger.debug('Now playing track: %s - %s', artists, track.name)
         try:
             self.lastfm.update_now_playing(
-                artists,
+                artist,
                 (track.name or ''),
                 album=(track.album and track.album.name or ''),
                 duration=str(duration),
@@ -54,9 +76,12 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
             logger.warning('Error submitting playing track to Last.fm: %s', e)
 
     def track_playback_ended(self, tl_track, time_position):
+        ''' Scrobble the current track but only submit the primary artist
+        instead of a combined string which could wrongfully create new
+        Last.FM artist pages. '''
         track = tl_track.track
-        artists = ', '.join(sorted([a.name for a in track.artists]))
-        duration = track.length and track.length // 1000 or 0
+        (artist, artists) = self.getArtists(track)
+        duration = self.getDuration(track)
         time_position = time_position // 1000
         if duration < 30:
             logger.debug('Track too short to scrobble. (30s)')
@@ -70,7 +95,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         logger.debug('Scrobbling track: %s - %s', artists, track.name)
         try:
             self.lastfm.scrobble(
-                artists,
+                artist,
                 (track.name or ''),
                 str(self.last_start_time),
                 album=(track.album and track.album.name or ''),
