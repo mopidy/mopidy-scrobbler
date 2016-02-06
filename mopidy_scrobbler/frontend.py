@@ -48,7 +48,9 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         artists = [a.name for a in track.artists]
         if track.album and track.album.artists:
             artists = [a.name for a in track.album.artists]
-            if artists[0] != 'Compilation' and artists[0] != 'Split':
+
+            metaArtists = ['compilation', 'split', 'various artists']
+            if artists[0].lower() in metaArtists:
                 artists = [a.name for a in track.artists]
         primaryArtist = artists[0]
         artists = '/'.join(artists)
