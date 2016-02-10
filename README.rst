@@ -71,9 +71,9 @@ v1.2.0 (2015-02-10)
   run by a user without a default Web browser or without access to the current
   display session, the URL given in the log output must be opened manually.
 
-- This version introduces configuration changes. `username` and `password` are
-  now `lastfm_username`, `lastfm_password` and `librefm_username`,
-  `librefm_password` for Last.fm and Libre.fm respectively.
+- This version introduces configuration changes. ``username`` and ``password``
+  are now ``lastfm_username``, ``lastfm_password`` and ``librefm_username``,
+  ``librefm_password`` for Last.fm and Libre.fm respectively.
 
 v1.1.2 (2015-01-06)
 -------------------
