@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# encoding: utf-8
 from __future__ import unicode_literals
 
 import os
@@ -5,7 +7,7 @@ import os
 from mopidy import config, ext
 
 
-__version__ = '1.1.1'
+__version__ = '1.3.0'
 
 
 class Extension(ext.Extension):
@@ -20,8 +22,10 @@ class Extension(ext.Extension):
 
     def get_config_schema(self):
         schema = super(Extension, self).get_config_schema()
-        schema['username'] = config.String()
-        schema['password'] = config.Secret()
+        schema['lastfm_username'] = config.String()
+        schema['lastfm_password'] = config.Secret()
+        schema['librefm_username'] = config.String()
+        schema['librefm_password'] = config.Secret()
         return schema
 
     def setup(self, registry):
