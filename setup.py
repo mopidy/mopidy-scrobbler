@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
 import re
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 
 def get_version(filename):
@@ -27,11 +28,6 @@ setup(
         'Mopidy >= 0.18',
         'Pykka >= 1.1',
         'pylast >= 0.5.7',
-    ],
-    test_suite='nose.collector',
-    tests_require=[
-        'nose',
-        'mock >= 1.0',
     ],
     entry_points={
         'mopidy.ext': [
