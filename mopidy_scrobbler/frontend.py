@@ -3,14 +3,14 @@
 from __future__ import unicode_literals
 
 import logging
-import time
 import os
-
-import pykka
-import pylast
+import time
 
 from mopidy.core import CoreListener
 
+import pykka
+
+import pylast
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,8 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
 
     def on_start(self):
         if not (self.connect_to_lastfm() and self.connect_to_librefm()):
-            logger.warning("Couldn't connect to any scrobbling services. Mopidy Scrobbler will stop.")
+            logger.warning("Couldn't connect to any scrobbling services. "
+                           "Mopidy Scrobbler will stop.")
             self.stop()
 
     def connect_to_lastfm(self):
@@ -84,33 +85,41 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         success. '''
         if not os.path.exists(LIBREFM_SESSION_KEY_FILE):
             import webbrowser
-            import multiprocessing
-            logger.warning('The Libre.fm session key does not exist. A Web browser will open an authentication URL. Confirm access using your username and password. This has to be done only once.')
+            logger.warning('The Libre.fm session key does not exist. A Web '
+                           'browser will open an authentication URL. Confirm '
+                           'access using your username and password. This '
+                           'has to be done only once.')
 
             session_keygen = pylast.SessionKeyGenerator(self.librefm)
             auth_url = session_keygen.get_web_auth_url()
             webbrowser.open(auth_url)
-            logger.info('A Web browser may not be opened if you run Mopidy as a different user. In this case, you will have to manually open the link "{url}".'.format(url=auth_url))
+            logger.info('A Web browser may not be opened if you run Mopidy '
+                        'as a different user. In this case, you will have '
+                        'to manually open the link "{url}".'
+                        .format(url=auth_url))
 
-            remainingTime = 30 # approximately 30 seconds before timeout
+            remainingTime = 30  # approximately 30 seconds before timeout
             while remainingTime:
                 try:
-                    session_key = session_keygen.get_web_auth_session_key(auth_url)
+                    session_key = session_keygen \
+                                    .get_web_auth_session_key(auth_url)
                     # if the file was created in the meantime, it will
                     # be blindly overwritten:
-                    f = open(LIBREFM_SESSION_KEY_FILE, 'w')
-                    f.write(session_key)
-                    f.close()
-                    logger.debug('Libre.fm session key retrieved and written to disk.')
+                    with open(LIBREFM_SESSION_KEY_FILE, 'w') as f:
+                        f.write(session_key)
+                    logger.debug('Libre.fm session key retrieved and written '
+                                 'to disk.')
                     break
                 except pylast.WSError:
                     remainingTime -= 1
                     time.sleep(1)
-                except PermissionError:
-                    logger.error('Cannot write to session key file "{path}"'.format(path=LIBREFM_SESSION_KEY_FILE))
+                except IOError:
+                    logger.error('Cannot write to session key file "{path}"'
+                                 .format(path=LIBREFM_SESSION_KEY_FILE))
                     return False
             if not remainingTime:
-                logger.error('Authenticating to Libre.fm timed out. Did you allow access in your Web browser?')
+                logger.error('Authenticating to Libre.fm timed out. Did you '
+                             'allow access in your Web browser?')
                 return False
         else:
             session_key = open(LIBREFM_SESSION_KEY_FILE).read()
@@ -159,7 +168,8 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                     mbid=(track.musicbrainz_id or ''))
             except (pylast.ScrobblingError, pylast.NetworkError,
                     pylast.MalformedResponseError, pylast.WSError) as e:
-                logger.warning('Error submitting playing track to {network}: {error}'.format(network=network[0], error=e))
+                logger.warning('Error submitting playing track to {network}: '
+                               '{error}'.format(network=network[0], error=e))
 
     def track_playback_ended(self, tl_track, time_position):
         ''' Scrobble the current track but only submit the primary
@@ -191,4 +201,5 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                     mbid=(track.musicbrainz_id or ''))
             except (pylast.ScrobblingError, pylast.NetworkError,
                     pylast.MalformedResponseError, pylast.WSError) as e:
-                logger.warning('Error submitting played track to {network}: {error}'.format(network=network[0], error=e))
+                logger.warning('Error submitting played track to {network}: '
+                               '{error}'.format(network=network[0], error=e))
