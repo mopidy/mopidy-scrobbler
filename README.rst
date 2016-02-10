@@ -19,9 +19,9 @@ Mopidy-Scrobbler
    :alt: Test coverage
 
 `Mopidy <http://www.mopidy.com/>`_ extension for scrobbling played tracks to
-`Last.fm <http://www.last.fm/>`_.
+`Last.fm <http://www.last.fm/>`_ and `Libre.fm <https://libre.fm/>`_.
 
-This extension requires a free user account at Last.fm.
+This extension requires a free user account at Last.fm and/or Libre.fm.
 
 
 Installation
@@ -39,18 +39,22 @@ Configuration
 =============
 
 The extension is enabled by default when it is installed. You just need to add
-your Last.fm username and password to your Mopidy configuration file, typically
-found at ``~/.config/mopidy/mopidy.conf``::
+your Last.fm and/or Libre.fm username and password to your Mopidy configuration
+file, typically found at ``~/.config/mopidy/mopidy.conf``::
 
     [scrobbler]
-    username = alice
-    password = secret
+    lastfm_username = alice
+    lastfm_password = secret
+    librefm_username = bob
+    librefm_password = anotherSecret
 
 The following configuration values are available:
 
 - ``scrobbler/enabled``: If the scrobbler extension should be enabled or not.
-- ``scrobbler/username``: Your Last.fm username.
-- ``scrobbler/password``: Your Last.fm password.
+- ``scrobbler/lastfm_username``: Your Last.fm username.
+- ``scrobbler/lastfm_password``: Your Last.fm password.
+- ``scrobbler/librefm_username``: Your Libre.fm username.
+- ``scrobbler/librefm_password``: Your Libre.fm password.
 
 
 Project resources
