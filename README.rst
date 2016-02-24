@@ -67,7 +67,7 @@ Project resources
 Changelog
 =========
 
-v1.2.0 (2015-02-10)
+v1.2.0 (2016-02-10)
 -------------------
 
 - Allow scrobbling to Libre.fm. A session key must be created beforehand.
@@ -79,7 +79,7 @@ v1.2.0 (2015-02-10)
   are now ``lastfm_username``, ``lastfm_password`` and ``librefm_username``,
   ``librefm_password`` for Last.fm and Libre.fm respectively.
 
-v1.1.2 (2015-01-06)
+v1.1.2 (2016-01-06)
 -------------------
 
 - Scrobble only the first given artist instead of a concatenated string of
