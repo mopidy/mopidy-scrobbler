@@ -6,10 +6,6 @@ Mopidy-Scrobbler
     :target: https://pypi.python.org/pypi/Mopidy-Scrobbler/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/pypi/dm/Mopidy-Scrobbler.svg?style=flat
-    :target: https://pypi.python.org/pypi/Mopidy-Scrobbler/
-    :alt: Number of PyPI downloads
-
 .. image:: https://img.shields.io/travis/mopidy/mopidy-scrobbler/master.svg?style=flat
     :target: https://travis-ci.org/mopidy/mopidy-scrobbler
     :alt: Travis CI build status
