@@ -1,8 +1,8 @@
 *.egg-info
 *.pyc
 *.swp
-.cache/
 .coverage
+.pytest_cache/
 .tox/
 MANIFEST
 build/
