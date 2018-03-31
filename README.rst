@@ -67,6 +67,11 @@ Credits
 Changelog
 =========
 
+v1.2.0 (UNRELEASED)
+-------------------
+
+- Require pylast >= 1.6.0, which is the version packed in Debian stable.
+
 v1.1.1 (2014-12-29)
 -------------------
 

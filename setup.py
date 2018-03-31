@@ -27,7 +27,7 @@ setup(
         'setuptools',
         'Mopidy >= 0.18',
         'Pykka >= 1.1',
-        'pylast >= 0.5.7',
+        'pylast >= 1.6.0',
     ],
     entry_points={
         'mopidy.ext': [
