@@ -15,6 +15,13 @@ logger = logging.getLogger(__name__)
 API_KEY = '2236babefa8ebb3d93ea467560d00d04'
 API_SECRET = '94d9a09c0cd5be955c4afaeaffcaefcd'
 
+PYLAST_ERRORS = tuple(
+    getattr(pylast, exc_name)
+    for exc_name in (
+        'ScrobblingError', 'NetworkError', 'MalformedResponseError', 'WSError')
+    if hasattr(pylast, exc_name)
+)
+
 
 class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
     def __init__(self, config, core):
@@ -30,8 +37,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 username=self.config['scrobbler']['username'],
                 password_hash=pylast.md5(self.config['scrobbler']['password']))
             logger.info('Scrobbler connected to Last.fm')
-        except (pylast.NetworkError, pylast.MalformedResponseError,
-                pylast.WSError) as e:
+        except PYLAST_ERRORS as e:
             logger.error('Error during Last.fm setup: %s', e)
             self.stop()
 
@@ -49,8 +55,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 duration=str(duration),
                 track_number=str(track.track_no or 0),
                 mbid=(track.musicbrainz_id or ''))
-        except (pylast.ScrobblingError, pylast.NetworkError,
-                pylast.MalformedResponseError, pylast.WSError) as e:
+        except PYLAST_ERRORS as e:
             logger.warning('Error submitting playing track to Last.fm: %s', e)
 
     def track_playback_ended(self, tl_track, time_position):
@@ -77,6 +82,5 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 track_number=str(track.track_no or 0),
                 duration=str(duration),
                 mbid=(track.musicbrainz_id or ''))
-        except (pylast.ScrobblingError, pylast.NetworkError,
-                pylast.MalformedResponseError, pylast.WSError) as e:
+        except PYLAST_ERRORS as e:
             logger.warning('Error submitting played track to Last.fm: %s', e)
