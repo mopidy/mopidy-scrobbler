@@ -14,8 +14,8 @@ Mopidy-Scrobbler
    :target: https://coveralls.io/r/mopidy/mopidy-scrobbler?branch=master
    :alt: Test coverage
 
-`Mopidy <http://www.mopidy.com/>`_ extension for scrobbling played tracks to
-`Last.fm <http://www.last.fm/>`_.
+`Mopidy <https://www.mopidy.com/>`_ extension for scrobbling played tracks to
+`Last.fm <https://www.last.fm/>`_.
 
 This extension requires a free user account at Last.fm.
 
@@ -28,7 +28,7 @@ Install by running::
     pip install Mopidy-Scrobbler
 
 Or, if available, install the Debian/Ubuntu package from `apt.mopidy.com
-<http://apt.mopidy.com/>`_.
+<https://apt.mopidy.com/>`_.
 
 
 Configuration
