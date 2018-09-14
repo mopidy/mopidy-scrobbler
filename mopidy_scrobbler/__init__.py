@@ -21,7 +21,7 @@ class Extension(ext.Extension):
     def get_config_schema(self):
         schema = super(Extension, self).get_config_schema()
         schema['username'] = config.String()
-        schema['password'] = config.Secret()
+        schema['password_hash'] = config.Secret()
         return schema
 
     def setup(self, registry):
