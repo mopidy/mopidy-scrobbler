@@ -35,7 +35,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
             self.lastfm = pylast.LastFMNetwork(
                 api_key=API_KEY, api_secret=API_SECRET,
                 username=self.config['scrobbler']['username'],
-                password_hash=self.config['scrobbler']['password_hash'])
+                password_hash=self.config['scrobbler']['password_hash'].lower())
             logger.info('Scrobbler connected to Last.fm')
         except PYLAST_ERRORS as e:
             logger.error('Error during Last.fm setup: %s', e)
