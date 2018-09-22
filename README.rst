@@ -34,19 +34,18 @@ Or, if available, install the Debian/Ubuntu package from `apt.mopidy.com
 Configuration
 =============
 
-The extension is enabled by default when it is installed. You just need to add
-your Last.fm username and password to your Mopidy configuration file, typically
-found at ``~/.config/mopidy/mopidy.conf``::
+The extension is enabled by default when it is installed. You just need to add your Last.fm username and the md5 hash of your paasword to your Mopidy configuration file, typically found at ``~/.config/mopidy/mopidy.conf``::
 
     [scrobbler]
     username = alice
-    password = secret
+    password_hash = secret
 
 The following configuration values are available:
 
 - ``scrobbler/enabled``: If the scrobbler extension should be enabled or not.
 - ``scrobbler/username``: Your Last.fm username.
-- ``scrobbler/password``: Your Last.fm password.
+- ``scrobbler/password_hash``: The MD5 hash of your Last.fm password.
+
 
 
 Project resources
