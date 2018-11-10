@@ -17,6 +17,7 @@ class FrontendTest(unittest.TestCase):
             'scrobbler': {
                 'username': 'alice',
                 'password': 'secret',
+                'scrobble_filter': ['spotify']
             }
         }
         self.frontend = frontend_lib.ScrobblerFrontend(
@@ -48,6 +49,7 @@ class FrontendTest(unittest.TestCase):
         artists = [models.Artist(name='ABC'), models.Artist(name='XYZ')]
         album = models.Album(name='The Collection')
         track = models.Track(
+            uri='local:track:1234567890',
             name='One Two Three',
             artists=artists,
             album=album,
@@ -68,7 +70,7 @@ class FrontendTest(unittest.TestCase):
 
     def test_track_playback_started_has_default_values(self, pylast_mock):
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-        track = models.Track()
+        track = models.Track(uri='local:track:1234567890')
         tl_track = models.TlTrack(track=track, tlid=17)
 
         self.frontend.track_playback_started(tl_track)
@@ -86,7 +88,7 @@ class FrontendTest(unittest.TestCase):
         pylast_mock.NetworkError = pylast.NetworkError
         self.frontend.lastfm.update_now_playing.side_effect = (
             pylast.NetworkError(None, 'foo'))
-        track = models.Track()
+        track = models.Track(uri='local:track:1234567890')
         tl_track = models.TlTrack(track=track, tlid=17)
 
         self.frontend.track_playback_started(tl_track)
@@ -97,6 +99,7 @@ class FrontendTest(unittest.TestCase):
         artists = [models.Artist(name='ABC'), models.Artist(name='XYZ')]
         album = models.Album(name='The Collection')
         track = models.Track(
+            uri='local:track:1234567890',
             name='One Two Three',
             artists=artists,
             album=album,
@@ -119,7 +122,7 @@ class FrontendTest(unittest.TestCase):
     def test_track_playback_ended_has_default_values(self, pylast_mock):
         self.frontend.last_start_time = 123
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-        track = models.Track(length=180432)
+        track = models.Track(length=180432, uri='local:track:1234567890')
         tl_track = models.TlTrack(track=track, tlid=17)
 
         self.frontend.track_playback_ended(tl_track, 150000)
@@ -135,7 +138,7 @@ class FrontendTest(unittest.TestCase):
 
     def test_does_not_scrobble_tracks_shorter_than_30_sec(self, pylast_mock):
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-        track = models.Track(length=20432)
+        track = models.Track(length=20432, uri='local:track:1234567890')
         tl_track = models.TlTrack(track=track, tlid=17)
 
         self.frontend.track_playback_ended(tl_track, 20432)
@@ -144,7 +147,7 @@ class FrontendTest(unittest.TestCase):
 
     def test_does_not_scrobble_if_played_less_than_half(self, pylast_mock):
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-        track = models.Track(length=180432)
+        track = models.Track(length=180432, uri='local:track:1234567890')
         tl_track = models.TlTrack(track=track, tlid=17)
 
         self.frontend.track_playback_ended(tl_track, 60432)
@@ -153,12 +156,21 @@ class FrontendTest(unittest.TestCase):
 
     def test_does_scrobble_if_played_not_half_but_240_sec(self, pylast_mock):
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-        track = models.Track(length=880432)
+        track = models.Track(length=880432, uri='local:track:1234567890')
         tl_track = models.TlTrack(track=track, tlid=17)
 
         self.frontend.track_playback_ended(tl_track, 241432)
 
         self.assertEqual(self.frontend.lastfm.scrobble.call_count, 1)
+
+    def test_does_not_scrobble_if_uri_scheme_filtered(self, plylast.mock):
+        self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+        track = models.Track(length=880432, uri='spotify:track:1234567890')
+        tl_track = models.TlTrack(track=track, tlid=17)
+
+        self.frontend.track_playback_ended(tl_track, 241432)
+
+        self.assertEqual(self.frontend.lastfm.scrobble.call_count, 0)
 
     def test_track_playback_ended_catches_pylast_error(self, pylast_mock):
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)

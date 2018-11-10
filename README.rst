@@ -41,12 +41,14 @@ found at ``~/.config/mopidy/mopidy.conf``::
     [scrobbler]
     username = alice
     password = secret
+    scrobble_filer = list
 
 The following configuration values are available:
 
 - ``scrobbler/enabled``: If the scrobbler extension should be enabled or not.
 - ``scrobbler/username``: Your Last.fm username.
 - ``scrobbler/password``: Your Last.fm password.
+- ``scrobbler/scrobble_filter``: List of uri schemes to not scrobble - eg spotify
 
 
 Project resources

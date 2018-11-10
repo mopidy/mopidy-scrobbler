@@ -16,6 +16,7 @@ class ExtensionTest(unittest.TestCase):
         self.assertIn('enabled = true', config)
         self.assertIn('username =', config)
         self.assertIn('password =', config)
+        self.assertIn('scrobble_filter', config)
 
     def test_get_config_schema(self):
         ext = Extension()
@@ -24,6 +25,7 @@ class ExtensionTest(unittest.TestCase):
 
         self.assertIn('username', schema)
         self.assertIn('password', schema)
+        self.assertIn('scrobble_filter', schema)
 
     def test_setup(self):
         ext = Extension()

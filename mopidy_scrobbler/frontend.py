@@ -30,6 +30,14 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         self.lastfm = None
         self.last_start_time = None
 
+    def check_uri_scheme(self, uri):
+        uri_scheme = uri.split(':')[0]
+        if uri_scheme in self.config['scrobbler']['scrobble_filter']:
+            logger.info('Not scrobbling track from %s', uri_scheme)
+            return True
+        else:
+            return False
+
     def on_start(self):
         try:
             self.lastfm = pylast.LastFMNetwork(
@@ -43,6 +51,8 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
 
     def track_playback_started(self, tl_track):
         track = tl_track.track
+        if self.check_uri_scheme(track.uri):
+            return
         artists = ', '.join(sorted([a.name for a in track.artists]))
         duration = track.length and track.length // 1000 or 0
         self.last_start_time = int(time.time())
@@ -60,6 +70,8 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
 
     def track_playback_ended(self, tl_track, time_position):
         track = tl_track.track
+        if self.check_uri_scheme(track.uri):
+            return
         artists = ', '.join(sorted([a.name for a in track.artists]))
         duration = track.length and track.length // 1000 or 0
         time_position = time_position // 1000
