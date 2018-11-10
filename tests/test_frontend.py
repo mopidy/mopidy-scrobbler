@@ -163,7 +163,7 @@ class FrontendTest(unittest.TestCase):
 
         self.assertEqual(self.frontend.lastfm.scrobble.call_count, 1)
 
-    def test_does_not_scrobble_if_uri_scheme_filtered(self, pylast.mock):
+    def test_does_not_scrobble_if_uri_scheme_filtered(self, pylast_mock):
         self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
         track = models.Track(length=880432, uri='spotify:track:1234567890')
         tl_track = models.TlTrack(track=track, tlid=17)
