@@ -38,6 +38,16 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         else:
             return False
 
+    def concatenate_artist_names(self, objects):
+        names = sorted([a.name for a in objects]);
+        if len(names) == 0:
+            return ''
+        elif len(names) < 3:
+            return ' & '.join(names)
+        else:
+            first_lot = names[:len(names)-1]
+            return ', '.join(first_lot) + ' & ' + names[len(names)-1]
+
     def on_start(self):
         try:
             self.lastfm = pylast.LastFMNetwork(
@@ -53,7 +63,9 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         track = tl_track.track
         if self.check_uri_scheme(track.uri):
             return
-        artists = ', '.join(sorted([a.name for a in track.artists]))
+        artists = self.concatenate_artist_names(track.artists)
+        albumartists = self.concatenate_artist_names(track.album.artists)
+        logger.info("Scrobbler : Album Artists are %s", albumartists)
         duration = track.length and track.length // 1000 or 0
         self.last_start_time = int(time.time())
         logger.debug('Now playing track: %s - %s', artists, track.name)
@@ -62,6 +74,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 artists,
                 (track.name or ''),
                 album=(track.album and track.album.name or ''),
+                album_artist=albumartists,
                 duration=str(duration),
                 track_number=str(track.track_no or 0),
                 mbid=(track.musicbrainz_id or ''))
@@ -72,7 +85,8 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         track = tl_track.track
         if self.check_uri_scheme(track.uri):
             return
-        artists = ', '.join(sorted([a.name for a in track.artists]))
+        artists = self.concatenate_artist_names(track.artists)
+        albumartists = self.concatenate_artist_names(track.album.artists)
         duration = track.length and track.length // 1000 or 0
         time_position = time_position // 1000
         if duration < 30:
@@ -91,6 +105,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 (track.name or ''),
                 str(self.last_start_time),
                 album=(track.album and track.album.name or ''),
+                album_artist=albumartists,
                 track_number=str(track.track_no or 0),
                 duration=str(duration),
                 mbid=(track.musicbrainz_id or ''))
