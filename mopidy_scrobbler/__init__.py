@@ -22,7 +22,7 @@ class Extension(ext.Extension):
         schema = super(Extension, self).get_config_schema()
         schema['username'] = config.String()
         schema['password'] = config.Secret()
-        schema['scrobble_filter'] = config.List(optional=True)
+        schema['backend_blacklist'] = config.List(optional=True)
         return schema
 
     def setup(self, registry):

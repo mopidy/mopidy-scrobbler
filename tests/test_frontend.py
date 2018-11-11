@@ -17,7 +17,7 @@ class FrontendTest(unittest.TestCase):
             'scrobbler': {
                 'username': 'alice',
                 'password': 'secret',
-                'scrobble_filter': ['spotify']
+                'backend_blacklist': ['spotify']
             }
         }
         self.frontend = frontend_lib.ScrobblerFrontend(
