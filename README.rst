@@ -67,6 +67,12 @@ Credits
 Changelog
 =========
 
+v1.2.1 (UNRELEASED)
+-------------------
+
+- Require pylast < 3, as that version removed support for Python 2.7. (Fixes:
+  #30)
+
 v1.2.0 (2018-04-01)
 -------------------
 
