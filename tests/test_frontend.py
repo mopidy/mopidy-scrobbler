@@ -17,21 +17,34 @@ class FrontendTest(unittest.TestCase):
             'scrobbler': {
                 'username': 'alice',
                 'password': 'secret',
+            },
+            'proxy': {
+                'hostname': 'myhost',
+                'port': 8080
             }
         }
         self.frontend = frontend_lib.ScrobblerFrontend(
             self.config, mock.sentinel.core)
 
     def test_on_start_creates_lastfm_network(self, pylast_mock):
+        self.frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+        sk_gen = mock.Mock(spec=pylast.SessionKeyGenerator)
+        pylast_mock.SessionKeyGenerator.return_value = sk_gen
         pylast_mock.md5.return_value = mock.sentinel.password_hash
 
         self.frontend.on_start()
 
         pylast_mock.LastFMNetwork.assert_called_with(
             api_key=frontend_lib.API_KEY,
-            api_secret=frontend_lib.API_SECRET,
-            username='alice',
-            password_hash=mock.sentinel.password_hash)
+            api_secret=frontend_lib.API_SECRET)
+        self.frontend.lastfm.enable_proxy.assert_called_with(
+            'myhost',
+            8080)
+        pylast_mock.SessionKeyGenerator.assert_called_with(
+            self.frontend.lastfm)
+        sk_gen.get_session_key.assert_called_with(
+                'alice',
+                mock.sentinel.password_hash)
 
     def test_on_start_stops_actor_on_error(self, pylast_mock):
         pylast_mock.NetworkError = pylast.NetworkError
