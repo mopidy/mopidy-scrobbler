@@ -1,8 +1,10 @@
 import pathlib
 
+import pkg_resources
+
 from mopidy import config, ext
 
-__version__ = "1.2.1"
+__version__ = pkg_resources.get_distribution("Mopidy-Scrobbler").version
 
 
 class Extension(ext.Extension):
