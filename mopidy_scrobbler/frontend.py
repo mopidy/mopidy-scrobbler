@@ -1,12 +1,10 @@
 import logging
 import time
 
-from mopidy.core import CoreListener
-
 import pykka
 
 import pylast
-
+from mopidy.core import CoreListener
 
 logger = logging.getLogger(__name__)
 
