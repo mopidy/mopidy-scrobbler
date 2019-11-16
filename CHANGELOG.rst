@@ -2,6 +2,17 @@
 Changelog
 *********
 
+v2.0.0rc1 (2019-11-16)
+======================
+
+- Require Mopidy >= 3.0.0a4. No major changes required.
+
+- Require Python >= 3.7. No major changes required.
+
+- Require pylast >= 2.2, as that's the first version to support Python 3.7.
+
+- Update project setup.
+
 
 v1.2.1 (2019-03-10)
 ===================
