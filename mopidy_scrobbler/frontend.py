@@ -39,8 +39,8 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 password_hash=pylast.md5(self.config["scrobbler"]["password"]),
             )
             logger.info("Scrobbler connected to Last.fm")
-        except PYLAST_ERRORS as e:
-            logger.error("Error during Last.fm setup: %s", e)
+        except PYLAST_ERRORS as exc:
+            logger.error(f"Error during Last.fm setup: {exc}")
             self.stop()
 
     def track_playback_started(self, tl_track):
@@ -48,7 +48,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         artists = ", ".join(sorted([a.name for a in track.artists]))
         duration = track.length and track.length // 1000 or 0
         self.last_start_time = int(time.time())
-        logger.debug("Now playing track: %s - %s", artists, track.name)
+        logger.debug(f"Now playing track: {artists} - {track.name}")
         try:
             self.lastfm.update_now_playing(
                 artists,
@@ -58,8 +58,8 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 track_number=str(track.track_no or 0),
                 mbid=(track.musicbrainz_id or ""),
             )
-        except PYLAST_ERRORS as e:
-            logger.warning("Error submitting playing track to Last.fm: %s", e)
+        except PYLAST_ERRORS as exc:
+            logger.warning(f"Error submitting playing track to Last.fm: {exc}")
 
     def track_playback_ended(self, tl_track, time_position):
         track = tl_track.track
@@ -76,7 +76,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
             return
         if self.last_start_time is None:
             self.last_start_time = int(time.time()) - duration
-        logger.debug("Scrobbling track: %s - %s", artists, track.name)
+        logger.debug(f"Scrobbling track: {artists} - {track.name}")
         try:
             self.lastfm.scrobble(
                 artists,
@@ -87,5 +87,5 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 duration=str(duration),
                 mbid=(track.musicbrainz_id or ""),
             )
-        except PYLAST_ERRORS as e:
-            logger.warning("Error submitting played track to Last.fm: %s", e)
+        except PYLAST_ERRORS as exc:
+            logger.warning(f"Error submitting played track to Last.fm: {exc}")
