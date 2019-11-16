@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 import time
 
@@ -25,7 +23,7 @@ PYLAST_ERRORS = tuple(
 
 class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
     def __init__(self, config, core):
-        super(ScrobblerFrontend, self).__init__()
+        super().__init__()
         self.config = config
         self.lastfm = None
         self.last_start_time = None
