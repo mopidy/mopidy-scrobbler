@@ -25,10 +25,9 @@ Installation
 
 Install by running::
 
-    python3 -m pip install Mopidy-Scrobbler
+    sudo python3 -m pip install Mopidy-Scrobbler
 
-Or, if available, install the Debian/Ubuntu package from
-`apt.mopidy.com <https://apt.mopidy.com/>`_.
+See https://mopidy.com/ext/scrobbler/ for alternative installation methods.
 
 
 Configuration
