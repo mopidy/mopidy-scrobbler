@@ -53,7 +53,7 @@ Project resources
 
 - `Source code <https://github.com/mopidy/mopidy-scrobbler>`_
 - `Issue tracker <https://github.com/mopidy/mopidy-scrobbler/issues>`_
-- `Changelog <https://github.com/mopidy/mopidy-scrobbler/blob/master/CHANGELOG.rst>`_
+- `Changelog <https://github.com/mopidy/mopidy-scrobbler/releases>`_
 
 
 Credits
