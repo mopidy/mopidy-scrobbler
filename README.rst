@@ -6,9 +6,9 @@ Mopidy-Scrobbler
     :target: https://pypi.org/project/Mopidy-Scrobbler/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/circleci/build/gh/mopidy/mopidy-scrobbler
-    :target: https://circleci.com/gh/mopidy/mopidy-scrobbler
-    :alt: Travis CI build status
+.. image:: https://img.shields.io/github/workflow/status/mopidy/mopidy-scrobbler/CI
+    :target: https://github.com/mopidy/mopidy-scrobbler/actions
+    :alt: CI build status
 
 .. image:: https://img.shields.io/codecov/c/gh/mopidy/mopidy-scrobbler
     :target: https://codecov.io/gh/mopidy/mopidy-scrobbler
