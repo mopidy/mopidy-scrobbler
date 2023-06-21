@@ -8,7 +8,6 @@ __version__ = pkg_resources.get_distribution("Mopidy-Scrobbler").version
 
 
 class Extension(ext.Extension):
-
     dist_name = "Mopidy-Scrobbler"
     ext_name = "scrobbler"
     version = __version__
