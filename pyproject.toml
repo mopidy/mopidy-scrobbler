@@ -35,7 +35,11 @@ dev = [
     { include-group = "typing" },
 ]
 ruff = ["ruff"]
-tests = ["pytest", "pytest-cov"]
+tests = [
+    "pygobject",  # Remove once we require mopidy >= 4
+    "pytest",
+    "pytest-cov",
+]
 typing = ["pyright"]
 
 
@@ -63,7 +67,10 @@ filterwarnings = [
     # By default, fail tests on warnings
     "error",
     #
-    # Add any warnings you want to ignore here
+    # Add any warnings you want to ignore here:
+    #
+    # Ignore warnings already fixed in mopidy >= 4
+    "ignore:pkg_resources is deprecated as an API.*:DeprecationWarning:mopidy",
 ]
 
 
