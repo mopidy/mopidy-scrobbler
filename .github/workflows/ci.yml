@@ -7,45 +7,57 @@ on:
       - main
 
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hynek/build-and-inspect-python-package@v2
+
   main:
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: "Test: Python 3.9"
-            python: "3.9"
-            tox: py39
-          - name: "Test: Python 3.10"
-            python: "3.10"
-            tox: py310
-          - name: "Test: Python 3.11"
+          - name: "pytest (3.11)"
             python: "3.11"
-            tox: py311
+            tox: "3.11"
+          - name: "pytest (3.12)"
+            python: "3.12"
+            tox: "3.12"
+          - name: "pytest (3.13)"
+            python: "3.13"
+            tox: "3.13"
             coverage: true
-          - name: "Lint: check-manifest"
-            python: "3.11"
-            tox: check-manifest
-          - name: "Lint: flake8"
-            python: "3.11"
-            tox: flake8
+          - name: "pyright"
+            python: "3.13"
+            tox: "pyright"
+          - name: "ruff check"
+            python: "3.13"
+            tox: "ruff-check"
+          - name: "ruff format"
+            python: "3.13"
+            tox: "ruff-format"
 
     name: ${{ matrix.name }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/mopidy/ci:latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Fix home dir permissions to enable pip caching
         run: chown -R root /github/home
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: pip
-          cache-dependency-path: setup.cfg
-      - run: python -m pip install pygobject tox
+          allow-prereleases: true
+      - run: python -m pip install tox
       - run: python -m tox -e ${{ matrix.tox }}
         if: ${{ ! matrix.coverage }}
       - run: python -m tox -e ${{ matrix.tox }} -- --cov-report=xml
         if: ${{ matrix.coverage }}
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v5
         if: ${{ matrix.coverage }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
