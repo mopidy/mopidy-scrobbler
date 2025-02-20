@@ -10,6 +10,7 @@ from mopidy_scrobbler import frontend as frontend_lib
 @pytest.fixture
 def pylast_mock():
     with mock.patch("mopidy_scrobbler.frontend.pylast", spec=pylast) as m:
+        m.PyLastError = pylast.PyLastError
         yield m
 
 
