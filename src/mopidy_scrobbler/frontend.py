@@ -8,7 +8,7 @@ from mopidy.core import CoreListener
 logger = logging.getLogger(__name__)
 
 API_KEY = "2236babefa8ebb3d93ea467560d00d04"
-API_SECRET = "94d9a09c0cd5be955c4afaeaffcaefcd"
+API_SECRET = "94d9a09c0cd5be955c4afaeaffcaefcd"  # noqa: S105
 
 PYLAST_ERRORS = tuple(
     getattr(pylast, exc_name)
@@ -23,13 +23,14 @@ PYLAST_ERRORS = tuple(
 
 
 class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
-    def __init__(self, config, core):
+    def __init__(self, config, core) -> None:
         super().__init__()
         self.config = config
+        _ = core
         self.lastfm = None
         self.last_start_time = None
 
-    def on_start(self):
+    def on_start(self) -> None:
         try:
             self.lastfm = pylast.LastFMNetwork(
                 api_key=API_KEY,
@@ -39,10 +40,10 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
             )
             logger.info("Scrobbler connected to Last.fm")
         except PYLAST_ERRORS as exc:
-            logger.error(f"Error during Last.fm setup: {exc}")
+            logger.error(f"Error during Last.fm setup: {exc}")  # noqa: TRY400
             self.stop()
 
-    def track_playback_started(self, tl_track):
+    def track_playback_started(self, tl_track) -> None:
         track = tl_track.track
         artists = ", ".join(sorted([a.name for a in track.artists]))
         duration = (track.length and track.length // 1000) or 0
@@ -60,7 +61,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         except PYLAST_ERRORS as exc:
             logger.warning(f"Error submitting playing track to Last.fm: {exc}")
 
-    def track_playback_ended(self, tl_track, time_position):
+    def track_playback_ended(self, tl_track, time_position) -> None:
         track = tl_track.track
         artists = ", ".join(sorted([a.name for a in track.artists]))
         duration = (track.length and track.length // 1000) or 0

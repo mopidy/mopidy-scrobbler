@@ -81,10 +81,14 @@ target-version = "py311"
 select = ["ALL"]
 ignore = [
     # Add rules you want to ignore here
-    "D203",  # one-blank-line-before-class
-    "D213",  # multi-line-summary-second-line
-    "TD002", # missing-todo-author
-    "TD003", # missing-todo-link
+    "ANN",     # flake8-annotations -- TODO
+    "D",       # pydocstyle
+    "D203",    # one-blank-line-before-class
+    "D213",    # multi-line-summary-second-line
+    "G004",    # logging-f-string
+    "PLR2004", # magic-value-comparison -- TODO
+    "TD002",   # missing-todo-author
+    "TD003",   # missing-todo-link
     #
     # Conflicting with `ruff format`
     "COM812", # missing-trailing-comma

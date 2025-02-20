@@ -20,7 +20,7 @@ class Extension(ext.Extension):
         schema["password"] = config.Secret()
         return schema
 
-    def setup(self, registry):
+    def setup(self, registry) -> None:
         from .frontend import ScrobblerFrontend
 
         registry.add("frontend", ScrobblerFrontend)
