@@ -84,9 +84,7 @@ def test_track_playback_started_has_default_values(pylast_mock, frontend):
 def test_track_playback_started_catches_pylast_error(pylast_mock, frontend):
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
     pylast_mock.NetworkError = pylast.NetworkError
-    frontend.lastfm.update_now_playing.side_effect = pylast.NetworkError(
-        None, "foo"
-    )
+    frontend.lastfm.update_now_playing.side_effect = pylast.NetworkError(None, "foo")
     track = models.Track()
     tl_track = models.TlTrack(track=track, tlid=17)
 

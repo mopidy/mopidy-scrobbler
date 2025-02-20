@@ -69,9 +69,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
             logger.debug("Track too short to scrobble. (30s)")
             return
         if time_position < duration // 2 and time_position < 240:
-            logger.debug(
-                "Track not played long enough to scrobble. (50% or 240s)"
-            )
+            logger.debug("Track not played long enough to scrobble. (50% or 240s)")
             return
         if self.last_start_time is None:
             self.last_start_time = int(time.time()) - duration
