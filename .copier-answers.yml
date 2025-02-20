@@ -1,0 +1,10 @@
+_commit: v1.1.0
+_src_path: ../cookiecutter-mopidy-ext
+author_email: stein.magnus@jodal.no
+author_full_name: Stein Magnus Jodal
+dist_name: Mopidy-Scrobbler
+ext_name: scrobbler
+github_username: mopidy
+repo_name: mopidy-scrobbler
+short_description: Mopidy extension for scrobbling played tracks to Last.fm
+version: 2.0.1
