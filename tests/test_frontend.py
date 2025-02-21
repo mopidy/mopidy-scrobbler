@@ -1,4 +1,5 @@
 from unittest import mock
+from uuid import UUID
 
 import pylast
 import pytest
@@ -54,7 +55,7 @@ def test_track_playback_started_updates_now_playing(pylast_mock, frontend) -> No
         album=album,
         track_no=3,
         length=180432,
-        musicbrainz_id="59e2b08a-f428-4db6-85aa-a757f026aa2a",
+        musicbrainz_id=UUID("59e2b08a-f428-4db6-85aa-a757f026aa2a"),
     )
     tl_track = models.TlTrack(track=track, tlid=17)
 
@@ -103,7 +104,7 @@ def test_track_playback_ended_scrobbles_played_track(pylast_mock, frontend) -> N
         album=album,
         track_no=3,
         length=180432,
-        musicbrainz_id="59e2b08a-f428-4db6-85aa-a757f026aa2a",
+        musicbrainz_id=UUID("59e2b08a-f428-4db6-85aa-a757f026aa2a"),
     )
     tl_track = models.TlTrack(track=track, tlid=17)
 
@@ -112,10 +113,10 @@ def test_track_playback_ended_scrobbles_played_track(pylast_mock, frontend) -> N
     frontend.lastfm.scrobble.assert_called_with(
         "ABC, XYZ",
         "One Two Three",
-        "123",
-        duration="180",
+        123,
+        duration=180,
         album="The Collection",
-        track_number="3",
+        track_number=3,
         mbid="59e2b08a-f428-4db6-85aa-a757f026aa2a",
     )
 
@@ -129,7 +130,7 @@ def test_track_playback_ended_has_default_values(pylast_mock, frontend) -> None:
     frontend.track_playback_ended(tl_track, 150000)
 
     frontend.lastfm.scrobble.assert_called_with(
-        "", "", "123", duration="180", album="", track_number="0", mbid=""
+        "", "", 123, duration=180, album="", track_number=None, mbid=""
     )
 
 
