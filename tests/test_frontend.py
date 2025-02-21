@@ -2,8 +2,8 @@ from unittest import mock
 
 import pylast
 import pytest
-
 from mopidy import models
+
 from mopidy_scrobbler import frontend as frontend_lib
 
 
@@ -53,7 +53,7 @@ def test_track_playback_started_updates_now_playing(pylast_mock, frontend):
         album=album,
         track_no=3,
         length=180432,
-        musicbrainz_id="123-456",
+        musicbrainz_id="59e2b08a-f428-4db6-85aa-a757f026aa2a",
     )
     tl_track = models.TlTrack(track=track, tlid=17)
 
@@ -65,7 +65,7 @@ def test_track_playback_started_updates_now_playing(pylast_mock, frontend):
         duration="180",
         album="The Collection",
         track_number="3",
-        mbid="123-456",
+        mbid="59e2b08a-f428-4db6-85aa-a757f026aa2a",
     )
 
 
@@ -104,7 +104,7 @@ def test_track_playback_ended_scrobbles_played_track(pylast_mock, frontend):
         album=album,
         track_no=3,
         length=180432,
-        musicbrainz_id="123-456",
+        musicbrainz_id="59e2b08a-f428-4db6-85aa-a757f026aa2a",
     )
     tl_track = models.TlTrack(track=track, tlid=17)
 
@@ -117,7 +117,7 @@ def test_track_playback_ended_scrobbles_played_track(pylast_mock, frontend):
         duration="180",
         album="The Collection",
         track_number="3",
-        mbid="123-456",
+        mbid="59e2b08a-f428-4db6-85aa-a757f026aa2a",
     )
 
 

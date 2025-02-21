@@ -3,7 +3,6 @@ import time
 
 import pykka
 import pylast
-
 from mopidy.core import CoreListener
 
 logger = logging.getLogger(__name__)
@@ -46,14 +45,14 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
     def track_playback_started(self, tl_track):
         track = tl_track.track
         artists = ", ".join(sorted([a.name for a in track.artists]))
-        duration = track.length and track.length // 1000 or 0
+        duration = (track.length and track.length // 1000) or 0
         self.last_start_time = int(time.time())
         logger.debug(f"Now playing track: {artists} - {track.name}")
         try:
             self.lastfm.update_now_playing(
                 artists,
                 (track.name or ""),
-                album=(track.album and track.album.name or ""),
+                album=((track.album and track.album.name) or ""),
                 duration=str(duration),
                 track_number=str(track.track_no or 0),
                 mbid=(track.musicbrainz_id or ""),
@@ -64,7 +63,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
     def track_playback_ended(self, tl_track, time_position):
         track = tl_track.track
         artists = ", ".join(sorted([a.name for a in track.artists]))
-        duration = track.length and track.length // 1000 or 0
+        duration = (track.length and track.length // 1000) or 0
         time_position = time_position // 1000
         if duration < 30:
             logger.debug("Track too short to scrobble. (30s)")
@@ -82,7 +81,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 artists,
                 (track.name or ""),
                 str(self.last_start_time),
-                album=(track.album and track.album.name or ""),
+                album=((track.album and track.album.name) or ""),
                 track_number=str(track.track_no or 0),
                 duration=str(duration),
                 mbid=(track.musicbrainz_id or ""),
