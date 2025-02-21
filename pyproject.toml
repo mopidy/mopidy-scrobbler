@@ -1,17 +1,142 @@
+[project]
+name = "mopidy-scrobbler"
+description = "Mopidy extension for scrobbling played tracks to Last.fm"
+readme = "README.md"
+requires-python = ">= 3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Stein Magnus Jodal", email = "stein.magnus@jodal.no" }]
+classifiers = [
+    "Environment :: No Input/Output (Daemon)",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Sound/Audio :: Players",
+]
+dynamic = ["version"]
+dependencies = ["mopidy >= 3.4.1", "pykka >= 3.1.1", "pylast >= 4.2.0"]
+
+[project.urls]
+Homepage = "https://github.com/mopidy/mopidy-scrobbler"
+
+[project.entry-points."mopidy.ext"]
+scrobbler = "mopidy_scrobbler:Extension"
+
+
 [build-system]
-requires = ["setuptools >= 30.3.0", "wheel"]
+requires = ["setuptools >= 66", "setuptools-scm >= 7.1"]
+build-backend = "setuptools.build_meta"
 
 
-[tool.black]
-target-version = ["py39", "py310", "py311"]
-line-length = 80
+[dependency-groups]
+dev = [
+    "tox",
+    { include-group = "ruff" },
+    { include-group = "tests" },
+    { include-group = "typing" },
+]
+ruff = ["ruff"]
+tests = [
+    "pygobject",  # Remove once we require mopidy >= 4
+    "pytest",
+    "pytest-cov",
+]
+typing = ["pyright"]
 
 
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-line_length = 88
-known_tests = "tests"
-sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,TESTS,LOCALFOLDER"
+[tool.coverage.paths]
+source = ["src/", "*/site-packages/"]
+
+[tool.coverage.run]
+source_pkgs = ["mopidy_scrobbler"]
+
+[tool.coverage.report]
+show_missing = true
+
+
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "standard"
+# Not all dependencies have type hints:
+reportMissingTypeStubs = false
+# Already covered by ruff's flake8-self checks:
+reportPrivateImportUsage = false
+
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    # By default, fail tests on warnings
+    "error",
+    #
+    # Add any warnings you want to ignore here:
+    #
+    # Ignore warnings already fixed in mopidy >= 4
+    "ignore:pkg_resources is deprecated as an API.*:DeprecationWarning:mopidy",
+]
+
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    # Add rules you want to ignore here
+    "ANN",     # flake8-annotations -- TODO
+    "D",       # pydocstyle
+    "D203",    # one-blank-line-before-class
+    "D213",    # multi-line-summary-second-line
+    "G004",    # logging-f-string
+    "PLR2004", # magic-value-comparison -- TODO
+    "TD002",   # missing-todo-author
+    "TD003",   # missing-todo-link
+    #
+    # Conflicting with `ruff format`
+    "COM812", # missing-trailing-comma
+    "ISC001", # single-line-implicit-string-concatenation
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "ARG",  # flake8-unused-arguments
+    "D",    # pydocstyle
+    "S101", # assert
+]
+
+
+[tool.setuptools.package-data]
+"*" = ["*.conf"]
+
+
+[tool.setuptools_scm]
+# This section, even if empty, must be present for setuptools_scm to work
+
+
+[tool.tox]
+env_list = ["3.11", "3.12", "3.13", "pyright", "ruff-check", "ruff-format"]
+
+[tool.tox.env_run_base]
+package = "wheel"
+wheel_build_env = ".pkg"
+dependency_groups = ["tests"]
+commands = [
+    [
+        "pytest",
+        "--cov",
+        "--basetemp={envtmpdir}",
+        { replace = "posargs", extend = true },
+    ],
+]
+
+[tool.tox.env.pyright]
+dependency_groups = ["typing"]
+commands = [["pyright", "{posargs:src}"]]
+
+[tool.tox.env.ruff-check]
+skip_install = true
+dependency_groups = ["ruff"]
+commands = [["ruff", "check", "{posargs:.}"]]
+
+[tool.tox.env.ruff-format]
+skip_install = true
+dependency_groups = ["ruff"]
+commands = [["ruff", "format", "--check", "{posargs:.}"]]
