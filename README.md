@@ -29,7 +29,7 @@ If you want to be the maintainer of Mopidy-Scrobbler, please:
 
 ## Installation
 
-Install by running::
+Install by running:
 
 ```sh
 python3 -m pip install mopidy-scrobbler
@@ -80,8 +80,8 @@ uv sync
 
 ### Running tests
 
-To run all tests and linters in isolated environments using
-[tox](https://tox.wiki/) run:
+To run all tests and linters in isolated environments, use
+[tox](https://tox.wiki/):
 
 ```sh
 tox
@@ -99,7 +99,7 @@ To format the code, use [ruff](https://docs.astral.sh/ruff/):
 ruff format .
 ```
 
-To check for lints with ruff run:
+To check for lints with ruff, run:
 
 ```sh
 ruff check .
