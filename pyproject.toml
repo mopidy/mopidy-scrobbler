@@ -68,9 +68,6 @@ filterwarnings = [
     "error",
     #
     # Add any warnings you want to ignore here:
-    #
-    # Ignore warnings already fixed in mopidy >= 4
-    "ignore:pkg_resources is deprecated as an API.*:DeprecationWarning:mopidy",
 ]
 
 
