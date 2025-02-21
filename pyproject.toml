@@ -13,7 +13,7 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio :: Players",
 ]
 dynamic = ["version"]
-dependencies = ["mopidy >= 3.4.1", "pykka >= 3.1.1", "pylast >= 4.2.0"]
+dependencies = ["mopidy >= 4.0.0a3", "pykka >= 4", "pylast >= 4.2.0"]
 
 [project.urls]
 Homepage = "https://github.com/mopidy/mopidy-scrobbler"
