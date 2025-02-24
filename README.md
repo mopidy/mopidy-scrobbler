@@ -1,8 +1,8 @@
 # mopidy-scrobbler
 
-![PyPI - Version](https://img.shields.io/pypi/v/mopidy-scrobbler?link=https://pypi.org/p/mopidy-scrobbler)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mopidy/mopidy-scrobbler/ci.yml?link=https://github.com/mopidy/mopidy-scrobbler/actions/workflows/ci.yml)
-![Codecov](https://img.shields.io/codecov/c/gh/mopidy/mopidy-scrobbler?link=https://codecov.io/gh/mopidy/mopidy-scrobbler)
+[![Latest PyPI version](https://img.shields.io/pypi/v/mopidy-scrobbler)](https://pypi.org/p/mopidy-scrobbler)
+[![CI build status](https://img.shields.io/github/actions/workflow/status/mopidy/mopidy-scrobbler/ci.yml)](https://github.com/mopidy/mopidy-scrobbler/actions/workflows/ci.yml)
+[![Test coverage](https://img.shields.io/codecov/c/gh/mopidy/mopidy-scrobbler)](https://codecov.io/gh/mopidy/mopidy-scrobbler)
 
 [Mopidy](https://www.mopidy.com/) extension for scrobbling played tracks to [Last.fm](https://www.last.fm/).
 

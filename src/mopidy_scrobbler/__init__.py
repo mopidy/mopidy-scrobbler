@@ -7,7 +7,7 @@ __version__ = version("mopidy-scrobbler")
 
 
 class Extension(ext.Extension):
-    dist_name = "Mopidy-Scrobbler"
+    dist_name = "mopidy-scrobbler"
     ext_name = "scrobbler"
     version = __version__
 
