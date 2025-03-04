@@ -13,7 +13,7 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio :: Players",
 ]
 dynamic = ["version"]
-dependencies = ["mopidy >= 4.0.0a3", "pykka >= 4", "pylast >= 4.2.0"]
+dependencies = ["mopidy >= 4.0.0a4", "pykka >= 4", "pylast >= 4.2.0"]
 
 [project.urls]
 Homepage = "https://github.com/mopidy/mopidy-scrobbler"
@@ -35,11 +35,7 @@ dev = [
     { include-group = "typing" },
 ]
 ruff = ["ruff"]
-tests = [
-    "pygobject",  # Remove once we require mopidy >= 4
-    "pytest",
-    "pytest-cov",
-]
+tests = ["pytest", "pytest-cov"]
 typing = ["pyright"]
 
 
