@@ -21,6 +21,6 @@ class Extension(ext.Extension):
         return schema
 
     def setup(self, registry) -> None:
-        from .frontend import ScrobblerFrontend
+        from .frontend import ScrobblerFrontend  # noqa: PLC0415
 
         registry.add("frontend", ScrobblerFrontend)
