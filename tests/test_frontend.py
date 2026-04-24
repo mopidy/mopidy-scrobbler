@@ -4,6 +4,7 @@ from uuid import UUID
 import pylast
 import pytest
 from mopidy import models
+from mopidy.types import DurationMs, TracklistId, Uri
 
 from mopidy_scrobbler import frontend as frontend_lib
 
@@ -47,14 +48,15 @@ def test_on_start_stops_actor_on_error(pylast_mock, frontend) -> None:
 
 def test_track_playback_started_updates_now_playing(pylast_mock, frontend) -> None:
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-    artists = [models.Artist(name="ABC"), models.Artist(name="XYZ")]
+    artists = frozenset([models.Artist(name="ABC"), models.Artist(name="XYZ")])
     album = models.Album(name="The Collection")
     track = models.Track(
+        uri=Uri("test:123"),
         name="One Two Three",
         artists=artists,
         album=album,
         track_no=3,
-        length=180432,
+        length=DurationMs(180432),
         musicbrainz_id=UUID("59e2b08a-f428-4db6-85aa-a757f026aa2a"),
     )
     tl_track = models.TlTrack(track=track, tlid=17)
@@ -73,8 +75,8 @@ def test_track_playback_started_updates_now_playing(pylast_mock, frontend) -> No
 
 def test_track_playback_started_has_default_values(pylast_mock, frontend) -> None:
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-    track = models.Track()
-    tl_track = models.TlTrack(track=track, tlid=17)
+    track = models.Track(uri=Uri("test:foo"))
+    tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_started(tl_track)
 
@@ -87,8 +89,8 @@ def test_track_playback_started_catches_pylast_error(pylast_mock, frontend) -> N
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
     pylast_mock.NetworkError = pylast.NetworkError
     frontend.lastfm.update_now_playing.side_effect = pylast.NetworkError(None, "foo")
-    track = models.Track()
-    tl_track = models.TlTrack(track=track, tlid=17)
+    track = models.Track(uri=Uri("test:foo"))
+    tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_started(tl_track)
 
@@ -96,14 +98,15 @@ def test_track_playback_started_catches_pylast_error(pylast_mock, frontend) -> N
 def test_track_playback_ended_scrobbles_played_track(pylast_mock, frontend) -> None:
     frontend.last_start_time = 123
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-    artists = [models.Artist(name="ABC"), models.Artist(name="XYZ")]
+    artists = frozenset([models.Artist(name="ABC"), models.Artist(name="XYZ")])
     album = models.Album(name="The Collection")
     track = models.Track(
+        uri=Uri("test:123"),
         name="One Two Three",
         artists=artists,
         album=album,
         track_no=3,
-        length=180432,
+        length=DurationMs(180432),
         musicbrainz_id=UUID("59e2b08a-f428-4db6-85aa-a757f026aa2a"),
     )
     tl_track = models.TlTrack(track=track, tlid=17)
@@ -124,8 +127,8 @@ def test_track_playback_ended_scrobbles_played_track(pylast_mock, frontend) -> N
 def test_track_playback_ended_has_default_values(pylast_mock, frontend) -> None:
     frontend.last_start_time = 123
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-    track = models.Track(length=180432)
-    tl_track = models.TlTrack(track=track, tlid=17)
+    track = models.Track(uri=Uri("test:foo"), length=DurationMs(180432))
+    tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_ended(tl_track, 150000)
 
@@ -136,8 +139,8 @@ def test_track_playback_ended_has_default_values(pylast_mock, frontend) -> None:
 
 def test_does_not_scrobble_tracks_shorter_than_30_sec(pylast_mock, frontend) -> None:
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-    track = models.Track(length=20432)
-    tl_track = models.TlTrack(track=track, tlid=17)
+    track = models.Track(uri=Uri("test:foo"), length=DurationMs(20432))
+    tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_ended(tl_track, 20432)
 
@@ -146,8 +149,8 @@ def test_does_not_scrobble_tracks_shorter_than_30_sec(pylast_mock, frontend) -> 
 
 def test_does_not_scrobble_if_played_less_than_half(pylast_mock, frontend) -> None:
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-    track = models.Track(length=180432)
-    tl_track = models.TlTrack(track=track, tlid=17)
+    track = models.Track(uri=Uri("test:foo"), length=DurationMs(180432))
+    tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_ended(tl_track, 60432)
 
@@ -156,8 +159,8 @@ def test_does_not_scrobble_if_played_less_than_half(pylast_mock, frontend) -> No
 
 def test_does_scrobble_if_played_not_half_but_240_sec(pylast_mock, frontend) -> None:
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
-    track = models.Track(length=880432)
-    tl_track = models.TlTrack(track=track, tlid=17)
+    track = models.Track(uri=Uri("test:foo"), length=DurationMs(180432))
+    tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_ended(tl_track, 241432)
 
@@ -168,7 +171,7 @@ def test_track_playback_ended_catches_pylast_error(pylast_mock, frontend) -> Non
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
     pylast_mock.NetworkError = pylast.NetworkError
     frontend.lastfm.scrobble.side_effect = pylast.NetworkError(None, "foo")
-    track = models.Track(length=180432)
-    tl_track = models.TlTrack(track=track, tlid=17)
+    track = models.Track(uri=Uri("test:foo"), length=DurationMs(180432))
+    tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_ended(tl_track, 150000)
