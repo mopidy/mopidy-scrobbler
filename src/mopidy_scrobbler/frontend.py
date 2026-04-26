@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import datetime as dt
 import logging
-import time
 from typing import TYPE_CHECKING, cast, override
 
 import pykka
@@ -22,10 +22,15 @@ logger = logging.getLogger(__name__)
 API_KEY = "2236babefa8ebb3d93ea467560d00d04"
 API_SECRET = "94d9a09c0cd5be955c4afaeaffcaefcd"  # noqa: S105
 
+# Limits from https://www.last.fm/api/scrobbling
+MIN_DURATION = dt.timedelta(seconds=30)
+MIN_PLAYED_TIME = dt.timedelta(minutes=4)
+MIN_PLAYED_PERCENT = 50
+
 
 class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
     lastfm: pylast.LastFMNetwork
-    last_start_time: int | None
+    last_start_time: dt.datetime | None
 
     @override
     def __init__(
@@ -59,7 +64,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         track = tl_track.track
         artists = ", ".join(sorted([a.name for a in track.artists if a.name]))
         duration = (track.length and track.length // 1000) or 0
-        self.last_start_time = int(time.time())
+        self.last_start_time = dt.datetime.now(tz=dt.UTC)
         logger.debug(f"Now playing track: {artists} - {track.name}")
         try:
             self.lastfm.update_now_playing(
@@ -80,26 +85,37 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         time_position: DurationMs,
     ) -> None:
         track = tl_track.track
-        artists = ", ".join(sorted([a.name for a in track.artists if a.name]))
-        duration_sec = track.length // 1000 if track.length else None
-        time_position_sec = time_position // 1000
-        if duration_sec is None or duration_sec < 30:
-            logger.debug("Track too short to scrobble. (30s)")
+        duration = dt.timedelta(milliseconds=track.length) if track.length else None
+        position = dt.timedelta(milliseconds=time_position)
+
+        if duration is None or duration < MIN_DURATION:
+            logger.debug(
+                f"Track too short to scrobble (<{MIN_DURATION.total_seconds()}s)"
+            )
             return
-        if time_position_sec < duration_sec // 2 and time_position_sec < 240:
-            logger.debug("Track not played long enough to scrobble. (50% or 240s)")
+        if (
+            position < (duration * MIN_PLAYED_PERCENT / 100)
+            and position < MIN_PLAYED_TIME
+        ):
+            logger.debug(
+                "Track not played long enough to scrobble: "
+                f"{MIN_PLAYED_PERCENT}% or {MIN_PLAYED_TIME.total_seconds()}s"
+            )
             return
+
         if self.last_start_time is None:
-            self.last_start_time = int(time.time()) - duration_sec
+            self.last_start_time = dt.datetime.now(tz=dt.UTC) - duration
+
+        artists = ", ".join(sorted([a.name for a in track.artists if a.name]))
         logger.debug(f"Scrobbling track: {artists} - {track.name}")
         try:
             self.lastfm.scrobble(
                 artists,
                 (track.name or ""),
-                self.last_start_time,
+                round(self.last_start_time.timestamp()),
                 album=((track.album and track.album.name) or ""),
                 track_number=track.track_no,
-                duration=duration_sec,
+                duration=round(duration.total_seconds()),
                 mbid=(str(track.musicbrainz_id) if track.musicbrainz_id else ""),
             )
         except pylast.PyLastError as exc:
