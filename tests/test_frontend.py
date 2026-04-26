@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from unittest import mock
 from uuid import UUID
 
@@ -10,23 +10,35 @@ import pytest
 from mopidy import models
 from mopidy.types import DurationMs, TracklistId, Uri
 
-from mopidy_scrobbler.frontend import API_KEY, API_SECRET, ScrobblerFrontend
+from mopidy_scrobbler.frontend import NETWORK_CONFIG, ScrobblerFrontend
 
 if TYPE_CHECKING:
     from collections.abc import Generator
 
 
 @pytest.fixture
-def pylast_mock() -> Generator[mock.MagicMock]:
-    with mock.patch("mopidy_scrobbler.frontend.pylast", spec=pylast) as m:
-        m.PyLastError = pylast.PyLastError
-        yield m
+def pylast_mock(
+    monkeypatch: pytest.MonkeyPatch,
+) -> Generator[mock.MagicMock]:
+    with mock.patch("mopidy_scrobbler.frontend.pylast", spec=pylast) as mock_obj:
+        mock_obj.PyLastError = pylast.PyLastError
+        for config in NETWORK_CONFIG.values():
+            monkeypatch.setattr(
+                config,
+                "network_class",
+                getattr(mock_obj, config.network_class.__name__),
+            )
+        yield mock_obj
 
 
 @pytest.fixture
 def frontend() -> ScrobblerFrontend:
     config = {
-        "scrobbler": {"username": "alice", "password": "secret"},
+        "scrobbler": {
+            "network": "lastfm",
+            "username": "alice",
+            "password": "secret",
+        },
         "proxy": {
             "scheme": None,
             "hostname": None,
@@ -42,28 +54,37 @@ def frontend() -> ScrobblerFrontend:
     )
 
 
-def test_on_start_creates_lastfm_network(
+@pytest.mark.parametrize("network_name", list(NETWORK_CONFIG))
+def test_on_start_creates_network(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
+    network_name: str,
 ) -> None:
     pylast_mock.md5.return_value = mock.sentinel.password_hash
+    network_config = NETWORK_CONFIG[network_name]
+    frontend.config["scrobbler"]["network"] = network_name  # pyright: ignore[reportIndexIssue]
 
     frontend.on_start()
 
-    pylast_mock.LastFMNetwork.assert_called_with(
-        api_key=API_KEY,
-        api_secret=API_SECRET,
+    network_class = cast("mock.MagicMock", network_config.network_class)
+    network_class.assert_called_with(
+        api_key=network_config.api_key,
+        api_secret=network_config.api_secret,
         username="alice",
         password_hash=mock.sentinel.password_hash,
         proxy=None,
     )
 
 
+@pytest.mark.parametrize("network_name", list(NETWORK_CONFIG))
 def test_on_start_passes_configured_proxy(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
+    network_name: str,
 ) -> None:
     pylast_mock.md5.return_value = mock.sentinel.password_hash
+    network_config = NETWORK_CONFIG[network_name]
+    frontend.config["scrobbler"]["network"] = network_name  # pyright: ignore[reportIndexIssue]
     frontend.config["proxy"] = {  # pyright: ignore[reportIndexIssue]
         "scheme": "https",
         "hostname": "proxy.example.com",
@@ -74,9 +95,10 @@ def test_on_start_passes_configured_proxy(
 
     frontend.on_start()
 
-    pylast_mock.LastFMNetwork.assert_called_with(
-        api_key=API_KEY,
-        api_secret=API_SECRET,
+    network_class = cast("mock.MagicMock", network_config.network_class)
+    network_class.assert_called_with(
+        api_key=network_config.api_key,
+        api_secret=network_config.api_secret,
         username="alice",
         password_hash=mock.sentinel.password_hash,
         proxy="https://bob:hunter2@proxy.example.com:8080",

@@ -11,6 +11,7 @@ def test_get_default_config() -> None:
 
     assert "[scrobbler]" in config
     assert "enabled = true" in config
+    assert "network = lastfm" in config
     assert "username =" in config
     assert "password =" in config
 
@@ -20,6 +21,7 @@ def test_get_config_schema() -> None:
 
     schema = ext.get_config_schema()
 
+    assert "network" in schema
     assert "username" in schema
     assert "password" in schema
 

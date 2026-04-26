@@ -16,6 +16,7 @@ class Extension(ext.Extension):
 
     def get_config_schema(self) -> config.ConfigSchema:
         schema = super().get_config_schema()
+        schema["network"] = config.String(choices=["lastfm", "librefm"])
         schema["username"] = config.String()
         schema["password"] = config.Secret()
         return schema

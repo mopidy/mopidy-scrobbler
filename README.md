@@ -4,9 +4,10 @@
 [![CI build status](https://img.shields.io/github/actions/workflow/status/mopidy/mopidy-scrobbler/ci.yml)](https://github.com/mopidy/mopidy-scrobbler/actions/workflows/ci.yml)
 [![Test coverage](https://img.shields.io/codecov/c/gh/mopidy/mopidy-scrobbler)](https://codecov.io/gh/mopidy/mopidy-scrobbler)
 
-[Mopidy](https://www.mopidy.com/) extension for scrobbling played tracks to [Last.fm](https://www.last.fm/).
+[Mopidy](https://www.mopidy.com/) extension for scrobbling played tracks to
+[Last.fm](https://www.last.fm/) or [Libre.fm](https://libre.fm/).
 
-This extension requires a free user account at Last.fm.
+This extension requires a free user account at Last.fm or Libre.fm.
 
 ## Maintainer wanted
 
@@ -44,16 +45,27 @@ your Last.fm username and password to your Mopidy configuration file:
 
 ```ini
 [scrobbler]
-username = alice
-password = secret
+username = my-last.fm-username
+password = my-last.fm-password
+```
+
+To use Libre.fm instead, you must specify the `network` too:
+
+```ini
+[scrobbler]
+network = librefm
+username = my-libre.fm-username
+password = my-libre.fm-password
 ```
 
 The following configuration values are available:
 
 - `scrobbler/enabled`: If the scrobbler extension should be enabled or not.
   Defaults to enabled.
-- `scrobbler/username`: Your Last.fm username.
-- `scrobbler/password`: Your Last.fm password.
+- `scrobbler/network`: The scrobbling network to use. Can be either `lastfm` or
+  `librefm`. Defaults to `lastfm`.
+- `scrobbler/username`: Your Last.fm or Libre.fm username.
+- `scrobbler/password`: Your Last.fm or Libre.fm password.
 
 ## Project resources
 
