@@ -11,16 +11,16 @@ class Extension(ext.Extension):
     ext_name = "scrobbler"
     version = __version__
 
-    def get_default_config(self):
+    def get_default_config(self) -> str:
         return config.read(pathlib.Path(__file__).parent / "ext.conf")
 
-    def get_config_schema(self):
+    def get_config_schema(self) -> config.ConfigSchema:
         schema = super().get_config_schema()
         schema["username"] = config.String()
         schema["password"] = config.Secret()
         return schema
 
-    def setup(self, registry) -> None:
+    def setup(self, registry: ext.Registry) -> None:
         from .frontend import ScrobblerFrontend  # noqa: PLC0415
 
         registry.add("frontend", ScrobblerFrontend)
