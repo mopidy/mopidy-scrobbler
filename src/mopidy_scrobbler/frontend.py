@@ -29,7 +29,7 @@ MIN_PLAYED_PERCENT = 50
 
 
 class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
-    lastfm: pylast.LastFMNetwork
+    network: pylast.LastFMNetwork
     last_start_time: dt.datetime | None
 
     @override
@@ -47,7 +47,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
     def on_start(self) -> None:
         scrobbler_config = cast("ScrobblerConfig", self.config["scrobbler"])
         try:
-            self.lastfm = pylast.LastFMNetwork(
+            self.network = pylast.LastFMNetwork(
                 api_key=API_KEY,
                 api_secret=API_SECRET,
                 username=scrobbler_config["username"],
@@ -67,7 +67,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         self.last_start_time = dt.datetime.now(tz=dt.UTC)
         logger.debug(f"Now playing track: {artists} - {track.name}")
         try:
-            self.lastfm.update_now_playing(
+            self.network.update_now_playing(
                 artists,
                 (track.name or ""),
                 album=((track.album and track.album.name) or ""),
@@ -109,7 +109,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         artists = ", ".join(sorted([a.name for a in track.artists if a.name]))
         logger.debug(f"Scrobbling track: {artists} - {track.name}")
         try:
-            self.lastfm.scrobble(
+            self.network.scrobble(
                 artists,
                 (track.name or ""),
                 round(self.last_start_time.timestamp()),
