@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, cast, override
 import pykka
 import pylast
 from mopidy.core import CoreListener
+from mopidy.httpclient import format_proxy
 
 if TYPE_CHECKING:
     from mopidy.config import Config
@@ -46,6 +47,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
                 api_secret=API_SECRET,
                 username=scrobbler_config["username"],
                 password_hash=pylast.md5(scrobbler_config["password"]),
+                proxy=format_proxy(self.config["proxy"]),
             )
             logger.info("Scrobbler connected to Last.fm")
         except pylast.PyLastError as exc:

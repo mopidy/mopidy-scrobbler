@@ -24,7 +24,16 @@ def pylast_mock() -> Generator[mock.MagicMock]:
 
 @pytest.fixture
 def frontend() -> ScrobblerFrontend:
-    config = {"scrobbler": {"username": "alice", "password": "secret"}}
+    config = {
+        "scrobbler": {"username": "alice", "password": "secret"},
+        "proxy": {
+            "scheme": None,
+            "hostname": None,
+            "port": None,
+            "username": None,
+            "password": None,
+        },
+    }
     core = mock.sentinel.core
     return ScrobblerFrontend(
         config=config,  # pyright: ignore[reportArgumentType]
@@ -45,6 +54,31 @@ def test_on_start_creates_lastfm_network(
         api_secret=API_SECRET,
         username="alice",
         password_hash=mock.sentinel.password_hash,
+        proxy=None,
+    )
+
+
+def test_on_start_passes_configured_proxy(
+    pylast_mock: mock.MagicMock,
+    frontend: ScrobblerFrontend,
+) -> None:
+    pylast_mock.md5.return_value = mock.sentinel.password_hash
+    frontend.config["proxy"] = {  # pyright: ignore[reportIndexIssue]
+        "scheme": "https",
+        "hostname": "proxy.example.com",
+        "port": 8080,
+        "username": "bob",
+        "password": "hunter2",
+    }
+
+    frontend.on_start()
+
+    pylast_mock.LastFMNetwork.assert_called_with(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        username="alice",
+        password_hash=mock.sentinel.password_hash,
+        proxy="https://bob:hunter2@proxy.example.com:8080",
     )
 
 
