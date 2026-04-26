@@ -9,6 +9,8 @@ import pylast
 from mopidy.core import CoreListener
 from mopidy.httpclient import format_proxy
 
+from mopidy_scrobbler.types import NetworkConfig
+
 if TYPE_CHECKING:
     from mopidy.config import Config
     from mopidy.core import CoreProxy
@@ -19,8 +21,22 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-API_KEY = "2236babefa8ebb3d93ea467560d00d04"
-API_SECRET = "94d9a09c0cd5be955c4afaeaffcaefcd"  # noqa: S105
+NETWORK_CONFIG = {
+    "lastfm": NetworkConfig(
+        name="Last.fm",
+        network_class=pylast.LastFMNetwork,
+        api_key="2236babefa8ebb3d93ea467560d00d04",
+        api_secret="94d9a09c0cd5be955c4afaeaffcaefcd",  # noqa: S106
+    ),
+    "librefm": NetworkConfig(
+        name="Libre.fm",
+        network_class=pylast.LibreFMNetwork,
+        #
+        # Libre.fm API key may expire 2031-04-25
+        api_key="339f358f9ba0dc49e00a400c8cdd773e",
+        api_secret="4c3d7cf6f6379cb86e4c08231a347cda",  # noqa: S106
+    ),
+}
 
 # Limits from https://www.last.fm/api/scrobbling
 MIN_DURATION = dt.timedelta(seconds=30)
@@ -29,7 +45,7 @@ MIN_PLAYED_PERCENT = 50
 
 
 class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
-    lastfm: pylast.LastFMNetwork
+    network: pylast.LastFMNetwork | pylast.LibreFMNetwork
     last_start_time: dt.datetime | None
 
     @override
@@ -46,17 +62,18 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
     @override
     def on_start(self) -> None:
         scrobbler_config = cast("ScrobblerConfig", self.config["scrobbler"])
+        network_config = NETWORK_CONFIG[scrobbler_config["network"]]
         try:
-            self.lastfm = pylast.LastFMNetwork(
-                api_key=API_KEY,
-                api_secret=API_SECRET,
+            self.network = network_config.network_class(
+                api_key=network_config.api_key,
+                api_secret=network_config.api_secret,
                 username=scrobbler_config["username"],
                 password_hash=pylast.md5(scrobbler_config["password"]),
                 proxy=format_proxy(self.config["proxy"]),
             )
-            logger.info("Scrobbler connected to Last.fm")
+            logger.info(f"Scrobbler connected to {network_config.name}")
         except pylast.PyLastError as exc:
-            logger.error(f"Error during Last.fm setup: {exc}")  # noqa: TRY400
+            logger.error(f"Error during {network_config.name} setup: {exc}")  # noqa: TRY400
             self.stop()
 
     @override
@@ -67,7 +84,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         self.last_start_time = dt.datetime.now(tz=dt.UTC)
         logger.debug(f"Now playing track: {artists} - {track.name}")
         try:
-            self.lastfm.update_now_playing(
+            self.network.update_now_playing(
                 artists,
                 (track.name or ""),
                 album=((track.album and track.album.name) or ""),
@@ -109,7 +126,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         artists = ", ".join(sorted([a.name for a in track.artists if a.name]))
         logger.debug(f"Scrobbling track: {artists} - {track.name}")
         try:
-            self.lastfm.scrobble(
+            self.network.scrobble(
                 artists,
                 (track.name or ""),
                 round(self.last_start_time.timestamp()),

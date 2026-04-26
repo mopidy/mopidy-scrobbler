@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from unittest import mock
 from uuid import UUID
 
@@ -10,23 +10,35 @@ import pytest
 from mopidy import models
 from mopidy.types import DurationMs, TracklistId, Uri
 
-from mopidy_scrobbler.frontend import API_KEY, API_SECRET, ScrobblerFrontend
+from mopidy_scrobbler.frontend import NETWORK_CONFIG, ScrobblerFrontend
 
 if TYPE_CHECKING:
     from collections.abc import Generator
 
 
 @pytest.fixture
-def pylast_mock() -> Generator[mock.MagicMock]:
-    with mock.patch("mopidy_scrobbler.frontend.pylast", spec=pylast) as m:
-        m.PyLastError = pylast.PyLastError
-        yield m
+def pylast_mock(
+    monkeypatch: pytest.MonkeyPatch,
+) -> Generator[mock.MagicMock]:
+    with mock.patch("mopidy_scrobbler.frontend.pylast", spec=pylast) as mock_obj:
+        mock_obj.PyLastError = pylast.PyLastError
+        for config in NETWORK_CONFIG.values():
+            monkeypatch.setattr(
+                config,
+                "network_class",
+                getattr(mock_obj, config.network_class.__name__),
+            )
+        yield mock_obj
 
 
 @pytest.fixture
 def frontend() -> ScrobblerFrontend:
     config = {
-        "scrobbler": {"username": "alice", "password": "secret"},
+        "scrobbler": {
+            "network": "lastfm",
+            "username": "alice",
+            "password": "secret",
+        },
         "proxy": {
             "scheme": None,
             "hostname": None,
@@ -42,28 +54,37 @@ def frontend() -> ScrobblerFrontend:
     )
 
 
-def test_on_start_creates_lastfm_network(
+@pytest.mark.parametrize("network_name", list(NETWORK_CONFIG))
+def test_on_start_creates_network(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
+    network_name: str,
 ) -> None:
     pylast_mock.md5.return_value = mock.sentinel.password_hash
+    network_config = NETWORK_CONFIG[network_name]
+    frontend.config["scrobbler"]["network"] = network_name  # pyright: ignore[reportIndexIssue]
 
     frontend.on_start()
 
-    pylast_mock.LastFMNetwork.assert_called_with(
-        api_key=API_KEY,
-        api_secret=API_SECRET,
+    network_class = cast("mock.MagicMock", network_config.network_class)
+    network_class.assert_called_with(
+        api_key=network_config.api_key,
+        api_secret=network_config.api_secret,
         username="alice",
         password_hash=mock.sentinel.password_hash,
         proxy=None,
     )
 
 
+@pytest.mark.parametrize("network_name", list(NETWORK_CONFIG))
 def test_on_start_passes_configured_proxy(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
+    network_name: str,
 ) -> None:
     pylast_mock.md5.return_value = mock.sentinel.password_hash
+    network_config = NETWORK_CONFIG[network_name]
+    frontend.config["scrobbler"]["network"] = network_name  # pyright: ignore[reportIndexIssue]
     frontend.config["proxy"] = {  # pyright: ignore[reportIndexIssue]
         "scheme": "https",
         "hostname": "proxy.example.com",
@@ -74,9 +95,10 @@ def test_on_start_passes_configured_proxy(
 
     frontend.on_start()
 
-    pylast_mock.LastFMNetwork.assert_called_with(
-        api_key=API_KEY,
-        api_secret=API_SECRET,
+    network_class = cast("mock.MagicMock", network_config.network_class)
+    network_class.assert_called_with(
+        api_key=network_config.api_key,
+        api_secret=network_config.api_secret,
         username="alice",
         password_hash=mock.sentinel.password_hash,
         proxy="https://bob:hunter2@proxy.example.com:8080",
@@ -100,7 +122,7 @@ def test_track_playback_started_updates_now_playing(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
 ) -> None:
-    frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+    frontend.network = mock.Mock(spec=pylast.LastFMNetwork)
     artists = frozenset([models.Artist(name="ABC"), models.Artist(name="XYZ")])
     album = models.Album(name="The Collection")
     track = models.Track(
@@ -116,7 +138,7 @@ def test_track_playback_started_updates_now_playing(
 
     frontend.track_playback_started(tl_track)
 
-    frontend.lastfm.update_now_playing.assert_called_with(
+    frontend.network.update_now_playing.assert_called_with(
         "ABC, XYZ",
         "One Two Three",
         duration="180",
@@ -130,13 +152,13 @@ def test_track_playback_started_has_default_values(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
 ) -> None:
-    frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+    frontend.network = mock.Mock(spec=pylast.LastFMNetwork)
     track = models.Track(uri=Uri("test:foo"))
     tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_started(tl_track)
 
-    frontend.lastfm.update_now_playing.assert_called_with(
+    frontend.network.update_now_playing.assert_called_with(
         "", "", duration="0", album="", track_number="0", mbid=""
     )
 
@@ -145,9 +167,9 @@ def test_track_playback_started_catches_pylast_error(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
 ) -> None:
-    frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+    frontend.network = mock.Mock(spec=pylast.LastFMNetwork)
     pylast_mock.NetworkError = pylast.NetworkError
-    frontend.lastfm.update_now_playing.side_effect = pylast.NetworkError(None, "foo")
+    frontend.network.update_now_playing.side_effect = pylast.NetworkError(None, "foo")
     track = models.Track(uri=Uri("test:foo"))
     tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
@@ -159,7 +181,7 @@ def test_track_playback_ended_scrobbles_played_track(
     frontend: ScrobblerFrontend,
 ) -> None:
     frontend.last_start_time = dt.datetime(1970, 1, 1, 0, 2, 3, tzinfo=dt.UTC)
-    frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+    frontend.network = mock.Mock(spec=pylast.LastFMNetwork)
     artists = frozenset([models.Artist(name="ABC"), models.Artist(name="XYZ")])
     album = models.Album(name="The Collection")
     track = models.Track(
@@ -175,7 +197,7 @@ def test_track_playback_ended_scrobbles_played_track(
 
     frontend.track_playback_ended(tl_track, DurationMs(150000))
 
-    frontend.lastfm.scrobble.assert_called_with(
+    frontend.network.scrobble.assert_called_with(
         "ABC, XYZ",
         "One Two Three",
         123,
@@ -191,13 +213,13 @@ def test_track_playback_ended_has_default_values(
     frontend: ScrobblerFrontend,
 ) -> None:
     frontend.last_start_time = dt.datetime(1970, 1, 1, 0, 2, 3, tzinfo=dt.UTC)
-    frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+    frontend.network = mock.Mock(spec=pylast.LastFMNetwork)
     track = models.Track(uri=Uri("test:foo"), length=DurationMs(180432))
     tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_ended(tl_track, DurationMs(150000))
 
-    frontend.lastfm.scrobble.assert_called_with(
+    frontend.network.scrobble.assert_called_with(
         "",
         "",
         123,
@@ -212,48 +234,48 @@ def test_does_not_scrobble_tracks_shorter_than_30_sec(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
 ) -> None:
-    frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+    frontend.network = mock.Mock(spec=pylast.LastFMNetwork)
     track = models.Track(uri=Uri("test:foo"), length=DurationMs(20432))
     tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_ended(tl_track, DurationMs(20432))
 
-    assert frontend.lastfm.scrobble.call_count == 0
+    assert frontend.network.scrobble.call_count == 0
 
 
 def test_does_not_scrobble_if_played_less_than_half(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
 ) -> None:
-    frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+    frontend.network = mock.Mock(spec=pylast.LastFMNetwork)
     track = models.Track(uri=Uri("test:foo"), length=DurationMs(180432))
     tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_ended(tl_track, DurationMs(60432))
 
-    assert frontend.lastfm.scrobble.call_count == 0
+    assert frontend.network.scrobble.call_count == 0
 
 
 def test_does_scrobble_if_played_not_half_but_240_sec(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
 ) -> None:
-    frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+    frontend.network = mock.Mock(spec=pylast.LastFMNetwork)
     track = models.Track(uri=Uri("test:foo"), length=DurationMs(180432))
     tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
     frontend.track_playback_ended(tl_track, DurationMs(241432))
 
-    assert frontend.lastfm.scrobble.call_count == 1
+    assert frontend.network.scrobble.call_count == 1
 
 
 def test_track_playback_ended_catches_pylast_error(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
 ) -> None:
-    frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
+    frontend.network = mock.Mock(spec=pylast.LastFMNetwork)
     pylast_mock.NetworkError = pylast.NetworkError
-    frontend.lastfm.scrobble.side_effect = pylast.NetworkError(None, "foo")
+    frontend.network.scrobble.side_effect = pylast.NetworkError(None, "foo")
     track = models.Track(uri=Uri("test:foo"), length=DurationMs(180432))
     tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
 
