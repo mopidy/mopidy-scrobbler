@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 from typing import TYPE_CHECKING
 from unittest import mock
 from uuid import UUID
@@ -157,7 +158,7 @@ def test_track_playback_ended_scrobbles_played_track(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
 ) -> None:
-    frontend.last_start_time = 123
+    frontend.last_start_time = dt.datetime(1970, 1, 1, 0, 2, 3, tzinfo=dt.UTC)
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
     artists = frozenset([models.Artist(name="ABC"), models.Artist(name="XYZ")])
     album = models.Album(name="The Collection")
@@ -189,7 +190,7 @@ def test_track_playback_ended_has_default_values(
     pylast_mock: mock.MagicMock,
     frontend: ScrobblerFrontend,
 ) -> None:
-    frontend.last_start_time = 123
+    frontend.last_start_time = dt.datetime(1970, 1, 1, 0, 2, 3, tzinfo=dt.UTC)
     frontend.lastfm = mock.Mock(spec=pylast.LastFMNetwork)
     track = models.Track(uri=Uri("test:foo"), length=DurationMs(180432))
     tl_track = models.TlTrack(track=track, tlid=TracklistId(17))
